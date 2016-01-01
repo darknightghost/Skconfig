@@ -3,6 +3,7 @@
 
 import curses
 import traceback
+import locale
 from data import *
 from menu import *
 
@@ -31,6 +32,7 @@ class screen:
 	"radio"			[[text1,text2,text3...],selected-index]		Show a list and select one
 	'''
 	def __init__(self):
+		locale.setlocale(locale.LC_ALL, '')
 		self.stdscr = None
 		self.width = 0
 		self.height = 0
@@ -47,11 +49,13 @@ class screen:
 			self.stdscr.keypad(1)
 			color = color_t()
 			color.init_color()
+			self.stdscr.nodelay(0)
 			
 			#Draw background
 			self.stdscr.bkgd(' ',color.get_color(0,color_t.BLUE))
 			curses.curs_set(0)
-			self.stdscr.addstr(0,0,title,
+			e = encoder()
+			self.stdscr.addstr(0,0,e.convert(title),
 				color.get_color(color_t.WHITE,color_t.BLUE) | curses.A_BOLD)
 			self.update()
 			

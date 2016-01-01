@@ -2,6 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import curses
+import locale
+
+class encoder:
+	def __init__(self):
+		self.code = locale.getpreferredencoding()
+		return
+		
+	def convert(self,str):
+		return str.decode('utf-8','ignore').encode(self.code)
 
 class color_t:
 	BLACK = curses.COLOR_BLACK

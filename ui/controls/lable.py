@@ -7,8 +7,9 @@ from ui.ui import *
 
 class lable(control.control):
 	def __init__(self,frame,wnd,data):
+		e = encoder()
 		self.wnd = wnd
-		self.text = data[1]
+		self.text = e.convert(data[1])
 		c = color_t()
 		self.color = c.get_color(color_t.BLACK,color_t.WHITE) | curses.A_BOLD
 	

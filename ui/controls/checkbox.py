@@ -19,14 +19,16 @@ class checkbox(control.control):
 		return 1
 		
 	def refresh(self):
+		e = encoder()
 		if self.focus:
 			color = self.color | curses.A_REVERSE
 		else:
 			color = self.color
 		if self.data[2] == True:
-			self.wnd.addstr(self.pos.top, self.pos.left,"[\xFB] %s"%(self.data[1]),color)
+			self.wnd.addstr(self.pos.top, self.pos.left,
+				e.convert("[√] %s"%(self.data[1])),color)
 		else:
-			self.wnd.addstr(self.pos.top, self.pos.left,"[ ] %s"%(self.data[1]),color)
+			self.wnd.addstr(self.pos.top, self.pos.left,e.convert("[ ] %s"%(self.data[1])),color)
 		self.wnd.refresh()
 		return
 		
@@ -37,15 +39,14 @@ class checkbox(control.control):
 		self.focus = True;
 		self.refresh()
 		return
-		
-	
+
 	def on_lost_focus(self):
 		self.focus = False;
 		self.refresh()
 		return
 	
 	def on_key_press(self,key):
-		if key == curses.KEY_ENTER:
+		if key == ord('\n'):
 			self.data[2] = not self.data[2]
 			self.refresh()
 		return

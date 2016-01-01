@@ -6,10 +6,10 @@ import control
 from ui.ui import *
 
 class button(control.control):
-	def __init__(self,frame,wnd,data):
+	def __init__(self,wnd,data):
+		e = encoder()
 		self.wnd = wnd
-		self.parent = frame
-		self.text = data[0]
+		self.text = e.convert(data[0])
 		self.on_click = data[1]
 		c = color_t()
 		self.color = c.get_color(color_t.WHITE,color_t.RED) | curses.A_BOLD
@@ -33,6 +33,6 @@ class button(control.control):
 		return
 	
 	def on_key_press(self,key):
-		if key == curses.KEY_ENTER:
-			self.onclick(self.parent)
+		if key == ord('\n'):
+			self.on_click()
 		return

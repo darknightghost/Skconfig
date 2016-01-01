@@ -22,45 +22,88 @@ class ControlTypeError(Exception):
 		return "Unknow type of control: %s.%s"%(self.ctrl_type,self.msg)
 
 class menu:
+	FOCUS_BACK = -1
+	FOCUS_PREV = -2
+	FOCUS_NEXT = -3
 	#{control-name:(class,indent,able-get-focus)}
 	control_dict = {"lable" : (lable,0,False),
 		"checkbox" : (checkbox,4,True)}
 	def __init__(self,scr,title):
+		e = encoder()
 		self.scr = scr
 		self.back = False
-		self.title = title
+		self.title = e.convert(title)
 
 	def show_menu(self,menu):
 		#Draw window
 		self.draw_wnd()
-		
+
 		#Draw menu
-		page = self.analyse_menu(menu)
+		self.page = self.analyse_menu(menu)
 		self.index = 0
+		
+		self.btn_back = button(self.wnd,("Back",self.on_back))
+		self.btn_prev = button(self.wnd,("Prev",self.on_prev))
+		self.btn_next = button(self.wnd,("Next",self.on_next))
+		self.focus = 0
+
 		while not self.back:
 			#Clear menu
 			self.client.erase()
 			self.client.box()
 
+
 			#Draw buttons
-			btn_back = button(self,self.wnd,("Back",self.on_back))
-			btn_prev = button(self,self.wnd,("Prev",self.on_prev))
-			btn_next = button(self,self.wnd,("Next",self.on_next))
-			
-			btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
+
+			for left in range(1,self.rect.width - 1):
+				self.wnd.addch(self.rect.height - 2,left,' ')
+
+
+			self.btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
 			
 			if self.index > 0:
-				btn_prev.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 2 - 2),0,1)
+				self.btn_prev.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 2 - 2),0,1)
 			
-			if self.index + 1 < len(page):
-				btn_next.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 3 - 2),0,1)
+			if self.index + 1 < len(self.page):
+				self.btn_next.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 3 - 2),0,1)
 
 			#Draw menu
-			if len(page) > 0:
-				current_page = page[self.index]
+			if len(self.page) > 0:
+				current_page = self.page[self.index]
 				for l in current_page:
 					l[0].draw(l[1],l[2],l[3])
-			
+
+				#Check focus
+				i = self.focus
+				while True:
+					if i<0:
+						if i == self.FOCUS_BACK:
+							self.focus = i
+							self.btn_back.on_get_focus()
+							break
+						elif i == self.FOCUS_NEXT \
+							and self.index + 1 < len(self.page):
+							self.focus = i
+							self.btn_next.on_get_focus()
+							break
+						elif i == self.FOCUS_PREV and self.index > 0:
+							self.focus = i
+							self.btn_prev.on_get_focus()
+							break
+					elif current_page[i][4]:
+						self.focus = i
+						current_page[i][0].on_get_focus()
+						break
+					else:
+						self.focus = self.focus + 1
+					i = i + 1
+					if i >= len(current_page):
+						i = self.FOCUS_NEXT
+				
+			else:
+				self.focus = self.FOCUS_BACK
+				self.btn_back.on_get_focus()
+
 			self.wnd.refresh()
 			self.client.refresh()
 			
@@ -68,7 +111,8 @@ class menu:
 
 			#Key input
 			while not self.refresh:
-				pass
+				key = self.get_input()
+				self.dispatch_input(key)
 
 
 	def draw_wnd(self):
@@ -80,17 +124,18 @@ class menu:
 			(parent_rect.width - self.rect.width) / 2)
 
 		color = color_t()
+		e = encoder()
 
 		#Draw shadow
 		shadow_color = color.get_color(color_t.BLACK,color_t.BLUE)
 		for top in range(self.pos.top + 1,
 			self.pos.top + self.rect.height + 1):
-			self.scr.stdscr.addch(top,self.pos.left + self.rect.width,
-				'\xDB',shadow_color)
+			self.scr.stdscr.addstr(top,self.pos.left + self.rect.width,
+				e.convert('█'),shadow_color)
 		for left in range(self.pos.left + 1,
 			self.pos.left + self.rect.width):
-			self.scr.stdscr.addch(self.pos.top + self.rect.height,left,
-				'\xDB',shadow_color)
+			self.scr.stdscr.addstr(self.pos.top + self.rect.height,left,
+				e.convert('█'),shadow_color)
 		self.scr.stdscr.refresh()
 		
 		#Draw window
@@ -110,10 +155,37 @@ class menu:
 		return
 
 	def get_input(self):
-		pass
+		return self.scr.stdscr.getch()
+		
+	def dispatch_input(self,key):
+		if key == ord('\t'):
+			self.on_tab()
+		elif key == curses.KEY_UP:
+			self.on_up()
+		elif key == curses.KEY_DOWN:
+			self.on_down()
+		elif key == curses.KEY_LEFT:
+			self.on_left()
+		elif key == curses.KEY_RIGHT:
+			self.on_right()
+		elif key == curses.KEY_PPAGE:
+			self.on_prev()
+		elif key == curses.KEY_NPAGE:
+			self.on_next()
+		else:
+			if self.focus >= 0:
+				self.page[self.index][self.focus][0].on_key_press(key)
+			else:
+				if self.focus == self.FOCUS_BACK:
+					self.btn_back.on_key_press(key)
+				elif self.focus == self.FOCUS_PREV:
+					self.btn_prev.on_key_press(key)
+				elif self.focus == self.FOCUS_NEXT:
+					self.btn_next.on_key_press(key)
+		return
 	
 	def analyse_menu(self,menu):
-		#[[(control,pos,begin,max),...],...]
+		#[[(control,pos,begin,max,able-focus),...],...]
 		ret = []
 		max_height = self.client.getmaxyx()[0] - 2
 		
@@ -140,14 +212,16 @@ class menu:
 			#Add control
 			begin = 0
 			while ctrl_height > max_height - line:
-				page.append((ctrl,pos_t(line,1 + indent),begin,max_height - line))
+				page.append((ctrl,pos_t(line,1 + indent),begin,
+					max_height - line,self.control_dict[menu[ctrl_index][0]][1]))
 				begin = begin + (max_height - line)
 				ctrl_height = ctrl_height - (max_height - line)
 				line = 1
 				ret.append(page)
 				page = []
 				
-			page.append((ctrl,pos_t(line,1 + indent),begin,ctrl_height))
+			page.append((ctrl,pos_t(line,1 + indent),begin,
+				ctrl_height,self.control_dict[menu[ctrl_index][0]][1]))
 			line = line + ctrl_height
 
 			ctrl_index = ctrl_index + 1
@@ -161,10 +235,65 @@ class menu:
 		self.refresh = True
 		
 	def on_prev(self):
-		self.index = self.index - 1
-		self.refresh = True
-
+		if self.index > 0:
+			if self.focus >= 0: 
+				self.page[self.index][self.focus][0].on_lost_focus()
+				self.focus = 0
+			self.index = self.index - 1
+			self.refresh = True
+		return
 		
 	def on_next(self):
-		self.index = self.index + 1
-		self.refresh = True
+		if self.index < len(self.page) - 1:
+			if self.focus >= 0:
+				self.page[self.index][self.focus][0].on_lost_focus()
+				self.focus = 0
+			self.index = self.index + 1
+			self.refresh = True
+		return
+		
+	def on_tab(self):
+		if len(self.page) > 0:
+			if self.focus >= 0:
+				self.page[self.index][self.focus][0].on_lost_focus()
+			self.focus = self.focus + 1
+			if self.focus >= len(self.page[self.index]):
+				self.focus = self.FOCUS_NEXT
+			self.refresh = True
+		return
+		
+	def on_up(self):
+		if self.focus > 0 and len(self.page) > 0:
+			i = self.focus - 1
+			while i > 0:
+				if self.page[self.index][i][4]:
+					self.page[self.index][self.focus][0].on_lost_focus()
+					self.focus = i
+					self.refresh = True
+					break
+				i = i - 1
+		return
+		
+	def on_down(self):
+		if self.focus >= 0 and len(self.page) > 0:
+			for i in range(self.focus + 1,len(self.page[self.index])):
+				if self.page[self.index][i][4]:
+					self.page[self.index][self.focus][0].on_lost_focus()
+					self.focus = i
+					self.refresh = True
+					break
+		return
+		
+	def on_left(self):
+		if self.focus < self.FOCUS_BACK:
+			self.focus = self.focus + 1
+			self.refresh = True
+		return
+		
+	def on_right(self):
+		if self.focus < 0 and self.focus > self.FOCUS_NEXT:
+			self.focus = self.focus - 1
+			if self.focus == self.FOCUS_PREV and self.index <= 0:
+				self.focus = self.FOCUS_NEXT
+			self.refresh = True
+		return
