@@ -6,20 +6,73 @@ from controls.control import *
 from controls.button import *
 from controls.lable import *
 from controls.checkbox import *
+from controls.listcontrol import *
+from controls.textbox import *
 
 class ControlTypeError(Exception):
 	def __init__(self,ctrl_type):
 		self.ctrl_type = ctrl_type
 		self.msg = ""
 		return
-		
-	def __init__(self,ctrl_type,msg):
-		self.ctrl_type = ctrl_type
-		self.msg = msg
-		return
-		
+
 	def __str__(self):
 		return "Unknow type of control: %s.%s"%(self.ctrl_type,self.msg)
+
+class submenu(control.control):
+	def __init__(self,frame,wnd,data):
+		e = encoder()
+		self.wnd = wnd
+		self.title = e.convert(data[1])
+		self.data = data
+		self.frame = frame
+		c = color_t()
+		self.focused = False
+		self.color = c.get_color(color_t.BLACK,color_t.WHITE) | curses.A_BOLD
+		self.width = self.wnd.getmaxyx()[1] - 2 - 4
+		return
+	
+	def draw(self,pos,begin,max):
+		self.pos = pos
+		self.blank_len = self.width - len(self.title) - 3
+		self.refresh()
+		return 1
+		
+	def refresh(self):
+		e = encoder()
+		if self.focused:
+			color = self.color | curses.A_REVERSE
+		else:
+			color = self.color
+
+		self.wnd.addstr(self.pos.top,
+			self.pos.left,self.title,color)
+		
+		self.wnd.addstr(self.pos.top,
+			self.pos.left + len(self.title)," " * self.blank_len,color)
+		self.wnd.addstr(self.pos.top,
+			self.pos.left + len(self.title) + self.blank_len,"-->",color)
+		return
+	
+	def get_size(self):
+		return rect_t(self.wnd.getmaxyx()[1] - 2,1)
+	
+	def on_get_focus(self):
+		self.focused = True
+		self.refresh()
+		return
+	
+	def on_lost_focus(self):
+		self.focused = False
+		self.refresh()
+		return
+	
+	def on_key_press(self,key):
+		if key == ord('\n'):
+			e = encoder()
+			m = menu(self.frame.scr,e.unconvert(self.title))
+			m.show_menu(self.data[2])
+			self.frame.refresh = True
+		return
 
 class menu:
 	FOCUS_BACK = -1
@@ -27,7 +80,10 @@ class menu:
 	FOCUS_NEXT = -3
 	#{control-name:(class,indent,able-get-focus)}
 	control_dict = {"lable" : (lable,0,False),
-		"checkbox" : (checkbox,4,True)}
+		"checkbox" : (checkbox,4,True),
+		"listcontrol" : (listcontrol,4,True),
+		"textbox" : (textbox,4,True),
+		"submenu" : (submenu,4,True)}
 	def __init__(self,scr,title):
 		e = encoder()
 		self.scr = scr
@@ -48,6 +104,12 @@ class menu:
 		self.focus = 0
 
 		while not self.back:
+			#Draw title
+			color = color_t()
+			self.wnd.addstr(0,0," " * self.rect.width,color.get_color(0,color_t.WHITE) | curses.A_BOLD)
+			self.wnd.addstr(0, self.rect.width / 2 - len(self.title) / 2,self.title,color.get_color(0,color_t.WHITE) | curses.A_BOLD)
+			self.wnd.refresh()
+
 			#Clear menu
 			self.client.erase()
 			self.client.box()
@@ -142,7 +204,6 @@ class menu:
 		self.wnd = self.scr.stdscr.subwin(self.rect.height,self.rect.width,
 			self.pos.top,self.pos.left)
 		self.wnd.bkgd(' ',color.get_color(0,color_t.WHITE))
-		self.wnd.addstr(0, self.rect.width / 2 - len(self.title) / 2,self.title,color.get_color(0,color_t.WHITE) | curses.A_BOLD)
 		self.wnd.refresh()
 		
 		#Draw client region
@@ -172,6 +233,8 @@ class menu:
 			self.on_prev()
 		elif key == curses.KEY_NPAGE:
 			self.on_next()
+		elif key == 0x1B:
+			self.on_back()
 		else:
 			if self.focus >= 0:
 				self.page[self.index][self.focus][0].on_key_press(key)

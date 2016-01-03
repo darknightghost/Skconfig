@@ -4,6 +4,43 @@
 import curses
 import locale
 
+class utf8buf:
+	def __init__(self):
+		self.len = 0
+		self.buf = []
+	
+	def input(self,c):
+		if self.len == 0:
+			self.len = self.get_len(c)
+		self.buf.append(c)
+		self.len = self.len - 1
+		if self.len == 0:
+			e = encoder()
+			ret = e.encode(self.get_char())
+			self.buf = []
+			return ret
+		return None
+	
+	def get_len(self,c):
+		ret = 1
+		if (c & 0xC0) == 0xC0:
+			ret = ret + 1
+			if (c & 0xE0) == 0xE0:
+				ret = ret + 1
+				if (c & 0xF0) == 0xF0:
+					ret = ret + 1
+					if (c & 0xF8) == 0xF8:
+						ret = ret + 1
+						if (c & 0xFC) == 0xFC:
+							ret = ret + 1
+		return ret
+		
+	def get_char(self):
+		c = ''
+		for t in self.buf:
+			c + chr(t)
+		return c.decode("utf-8");
+
 class encoder:
 	def __init__(self):
 		self.code = locale.getpreferredencoding()
@@ -11,6 +48,12 @@ class encoder:
 		
 	def convert(self,str):
 		return str.decode('utf-8','ignore').encode(self.code)
+		
+	def encode(self,str):
+		return str.encode(self.code)
+		
+	def unconvert(self,str):
+		return str.decode(self.code,'ignore').encode('utf-8')
 
 class color_t:
 	BLACK = curses.COLOR_BLACK

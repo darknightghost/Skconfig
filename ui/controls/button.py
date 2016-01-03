@@ -16,19 +16,22 @@ class button(control.control):
 	
 	def draw(self,pos,begin,max):
 		self.pos = pos
-		self.wnd.addstr(self.pos.top, self.pos.left,"<%s>"%(self.text),self.color)
+		e = encoder()
+		self.wnd.addstr(self.pos.top, self.pos.left,e.convert("<%s>"%(self.text)),self.color)
 		return 1
 	
 	def get_size(self):
 		return rect_t(len(self.text) + 2,1)
 	
 	def on_get_focus(self):
-		self.wnd.addstr(self.pos.top, self.pos.left,"<%s>"%(self.text),self.color | curses.A_REVERSE)
+		e = encoder()
+		self.wnd.addstr(self.pos.top, self.pos.left,e.convert("<%s>"%(self.text)),self.color | curses.A_REVERSE)
 		self.wnd.refresh()
 		return
 	
 	def on_lost_focus(self):
-		self.wnd.addstr(self.pos.top, self.pos.left,"<%s>"%(self.text),self.color)
+		e = encoder()
+		self.wnd.addstr(self.pos.top, self.pos.left,e.convert("<%s>"%(self.text)),self.color)
 		self.wnd.refresh()
 		return
 	

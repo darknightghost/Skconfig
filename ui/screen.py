@@ -26,10 +26,10 @@ class screen:
 	Current support types:
 	Type			Value										Description
 	"lable"			None										Static text
-	"sub-menu"		menu										Sub Menu Entery
+	"submenu"		menu										Sub Menu Entery
 	"checkbox"		True or False								CheckBox
-	"input"			string										TextBox
-	"radio"			[[text1,text2,text3...],selected-index]		Show a list and select one
+	"textbox"		string										TextBox
+	"listcontrol"	[[text1,text2,text3...],selected-index]		Show a list and select one
 	'''
 	def __init__(self):
 		locale.setlocale(locale.LC_ALL, '')
