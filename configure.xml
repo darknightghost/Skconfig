@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skconfig>
+	<archs>
+		<!--Architecture to build-->
+		<build>x86</build>
+		<!--Supported Architecture-->
+		<arch name="x86">
+			<!--Build options,projects's private options can overide them-->
+			<AS>gcc</AS>
+			<AS_FLAGS>-m32 -c</AS_FLAGS>
+			<CC>gcc</CC>
+			<CC_FLAGS>-m32 -c</CC_FLAGS>
+			<LD>ld</LD>
+			<LD_FLAGS></LD_FLAGS>
+		</arch>
+		<arch name="amd64">
+			<AS>gcc</AS>
+			<AS_FLAGS>-c</AS_FLAGS>
+			<CC>gcc</CC>
+			<CC_FLAGS>-c</CC_FLAGS>
+			<LD>ld</LD>
+			<LD_FLAGS></LD_FLAGS>
+		</arch>
+	</archs>
+	<targets>
+		<target name="sanlo" build="true" src="src/sanlo"/>
+		<target name="sandnix" build="true" src="src/sandnix"/>
+		<target name="drivers" build="true" src="src/drivers"/>
+	</targets>
+</skconfig>
