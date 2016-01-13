@@ -7,19 +7,21 @@
 		<arch name="x86">
 			<!--Build options,projects's private options can overide them-->
 			<AS>gcc</AS>
-			<AS_FLAGS>-m32 -c</AS_FLAGS>
+			<ASFLAGS>-m32 -c</ASFLAGS>
 			<CC>gcc</CC>
-			<CC_FLAGS>-m32 -c</CC_FLAGS>
+			<CFLAGS>-m32 -c</CFLAGS>
 			<LD>ld</LD>
-			<LD_FLAGS></LD_FLAGS>
+			<LDFLAGS></LDFLAGS>
+			<CPP>gcc -M</CPP>
 		</arch>
 		<arch name="amd64">
 			<AS>gcc</AS>
-			<AS_FLAGS>-c</AS_FLAGS>
+			<ASFLAGS>-c</ASFLAGS>
 			<CC>gcc</CC>
-			<CC_FLAGS>-c</CC_FLAGS>
+			<CFLAGS>-c</CFLAGS>
 			<LD>ld</LD>
-			<LD_FLAGS></LD_FLAGS>
+			<LDFLAGS></LDFLAGS>
+			<CPP>gcc -M</CPP>
 		</arch>
 	</archs>
 	<targets>

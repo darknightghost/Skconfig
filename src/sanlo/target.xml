@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<target>
+	<prebuild-scripts>
+	</prebuild-scripts>
+	<afterbuild-scripts>
+	</afterbuild-scripts>
+	<options text="test menu1">
+		<option type="lable" text="group1" />
+		<option type="listcontrol" text="list1" value="0">
+			aaa
+			bbb
+			ccc
+		</option>
+		<option type="lable" text="group2" />
+		<option type="checkbox" text="chk1" value="true"/>
+		<option type="checkbox" text="chk2" value="false"/>
+	</options>
+	<options text="test menu2">
+	</options>
+</target>
