@@ -3,3 +3,8 @@
 
 from ui.ui import *
 
+
+#Read config
+#Show menu
+#Write config
+
