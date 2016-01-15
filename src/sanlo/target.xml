@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <target>
-	<prebuild-scripts>
-	</prebuild-scripts>
-	<afterbuild-scripts>
-	</afterbuild-scripts>
-	<options text="test menu1">
-		<option type="lable" text="group1" />
-		<option type="listcontrol" text="list1" value="0">
-			aaa
-			bbb
-			ccc
-		</option>
-		<option type="lable" text="group2" />
-		<option type="checkbox" text="chk1" value="true"/>
-		<option type="checkbox" text="chk2" value="false"/>
-	</options>
-	<options text="test menu2">
-	</options>
+	<build>
+		<arch name="amd64">
+			<!--Build options,projects's private options can override them-->
+			<AS type="textbox">gcc</AS>
+			<ASFLAGS type="textbox">-m32 -c</ASFLAGS>
+			<CC type="textbox">gcc</CC>
+			<CFLAGS type="textbox">-m32 -c</CFLAGS>
+			<LD type="textbox">ld</LD>
+			<LDFLAGS type="textbox"></LDFLAGS>
+			<CPP type="textbox">gcc -M</CPP>
+			<prebuild-scripts  type="textbox"/>
+			<afterbuild-scripts  type="textbox"/>
+		</arch>
+	</build>
+	<menu>
+		<options text="sanlo menu1">
+			<option type="lable" text="group1" />
+			<option type="listcontrol" text="list1" macro="-Daaa=" value="0">
+				aaa
+				bbb
+				ccc
+			</option>
+			<option type="lable" text="group2" />
+			<option type="checkbox" text="chk1" macro="-DbbB" value="true" />
+			<option type="checkbox" text="chk2" macro= "-Dccc" value="false" />
+		</options>
+		<options text="test menu2">
+		</options>
+	</menu>
 </target>

@@ -1,14 +1,13 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 '''
 	  Copyright 2016,暗夜幽灵 <darknightghost.cn@gmail.com>
 	  This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	  This program is distributed in the hope that it will be useful,
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -131,16 +130,17 @@ class menu:
 
 
 			#Draw buttons
-				for left in range(1,self.rect.width - 1):
-					self.wnd.addch(self.rect.height - 2,left,' ')
+			for left in range(1,self.rect.width - 1):
+				self.wnd.addch(self.rect.height - 2,left,' ')
 
-				self.btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
+			self.btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
 
+			if menu != []:
 				if self.index > 0:
 					self.btn_prev.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 2 - 2),0,1)
 			
-			if self.index + 1 < len(self.page):
-				self.btn_next.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 3 - 2),0,1)
+				if self.index + 1 < len(self.page):
+					self.btn_next.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 3 - 2),0,1)
 
 			#Draw menu
 			if len(self.page) > 0:

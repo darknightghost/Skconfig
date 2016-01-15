@@ -14,11 +14,17 @@
 	  You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+class ConflictedName(Exception):
+	def __init__(self,name):
+		self.name = name
+		return
 
-from ui.ui import *
+class ConflictedArchName(ConflictedName):
+	def __str__(self):
+		return "Conflicted name of architecture: %s."%(self.name)
 
-
-#Read config
-#Show menu
-#Write config
+class UnknownName(Exception):
+	def __init__(self,name):
+		self.name = name
+		return
 

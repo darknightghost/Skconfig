@@ -15,10 +15,12 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ui.ui import *
+class arch:
+	def __init__(self,node):
+		pass
 
-
-#Read config
-#Show menu
-#Write config
-
+	def open_menu(self):
+		pass
+		
+	def close_menu(self):
+		pass
