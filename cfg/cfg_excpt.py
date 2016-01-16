@@ -28,3 +28,20 @@ class UnknownName(Exception):
 		self.name = name
 		return
 
+class ElementNotFound(Exception):
+	def __init__(self,name):
+		self.name = name
+		return
+		
+	def __str__(self):
+		return "Element %s not found!"%(self.name)
+
+class UnknownNode(Exception):
+	def __init__(self,name,nodetype):
+		self.name = name
+		self.nodetype = nodetype
+		return
+
+	def __str__(self):
+		return "Unknow name of node,name=%s,type=%s."%(self.name,self.nodetype)
+

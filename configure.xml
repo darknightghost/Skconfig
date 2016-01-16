@@ -6,13 +6,16 @@
 						<!--Build options,projects's private options can override them-->			
 						<AS type="textbox">gcc</AS>			
 						<ASFLAGS type="textbox">-m32 -c</ASFLAGS>
+						<ASRULE></ASRULE>
 						<CC type="textbox">gcc</CC>	
 						<CFLAGS type="textbox">-m32 -c</CFLAGS>
+						<CCRULE></CCRULE>
 						<LD type="textbox">ld</LD>			
 						<LDFLAGS type="textbox" />			
-						<CPP type="textbox">gcc -M</CPP>			
-						<prebuild-scripts type="textbox" />			
-						<afterbuild-scripts type="textbox" />			
+						<CPP type="textbox">gcc -M</CPP>		
+						<CPPRULE></CPPRULE>	
+						<prebuild-command type="textbox" />			
+						<afterbuild-command type="textbox" />			
 				</arch>
 				<arch name="amd64">			
 						<AS type="textbox">gcc</AS>			
@@ -22,8 +25,8 @@
 						<LD type="textbox">ld</LD>			
 						<LDFLAGS type="textbox" />			
 						<CPP type="textbox">gcc -M</CPP>			
-						<prebuild-scripts type="textbox" />			
-						<afterbuild-scripts type="textbox" />			
+						<prebuild-command type="textbox" />			
+						<afterbuild-command type="textbox" />			
 				</arch>		
 		</build>	
 		<targets>		

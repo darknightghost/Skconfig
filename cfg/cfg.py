@@ -16,10 +16,7 @@
 '''
 
 from xml.dom import minidom
-from target import *
 from cfg_excpt import *
-from menuobj import *
-from arch import *
 
 class cfg:
 	def __init__(self,path):
@@ -57,3 +54,214 @@ class cfg:
 		
 	def close_menu(self):
 		pass
+
+################################Target#########################################			
+class target:
+	def __init__(self,node):
+		self.node = node
+		self.path = "%s/%s"%(os.getcwd(),node.getAttribute("src"))
+		old_path = os.getcwd()
+		os.chdir(self.path)
+		self.name = node.getAttribute("node")
+		self.file = open("target.xml","rw")
+		self.dom = minidom.parse(self.file)
+		root = self.dom.documentElement
+		
+		#Analyse architectures
+		#{"archname" : [archname,obj],"archname" : [archobj],...}
+		build_node = root.getElementsByTagName("build")[0]
+		arch_nodes = build_node.getElementsByTagName("arch")
+		self.archs = {}
+		for t in arch_nodes:
+			info = arch(t)
+			if info[0] in self.archs.keys():
+				raise ConflictedArchName(info[0])
+			else:
+				self.archs[info[0]] = info
+				
+		#Analyse menu
+		#[menu-object,menu-object,...]
+		self.menu_objs = []
+		menu_node = root.getElementsByTagName("menu")[0]
+		for t in menu_node.childNodes:
+			if isinstance(t,minidom.Element):
+				info = get_menu_obj(t)
+				menu_objs.append(info)
+
+		os.chdir(old_path)
+		return
+		
+	def __del__(self):
+		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		return
+		
+	def open_menu(self):
+		pass
+		
+	def close_menu(self):
+		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+
+##################################Arch#######################################	
+class arch:
+	self.option_names = ["AS","ASFLAGS","ASRULE","CC","CFLAGS","CCRULE","LD",
+			"LDFLAGS","LDRULE","CPP","CPPRULE","prebuild-command",
+			"afterbuild-command"]
+	def __init__(self,node):
+		self.node = node
+		self.name = node.getAttribute("name")
+		#{name : obj,name : obj,...}
+		self.options_dict = {}
+
+		for t in self.option_names:
+			try:
+				info_node = node.getElementsByTagName(t)[0]
+			except IndexError:
+				raise ElementNotFound(t)
+				
+			info_obj = get_menu_obj(info_node)
+			self.options_dict[t] = info_obj
+
+
+	def open_menu(self):
+		self.submenu = []
+		for t in self.option_names:
+			self.submenu.append(options_dict[t].open_menu())
+		self.menu = ["submenu",self.name,self.submenu]
+		
+	def close_menu(self):
+		for t in self.option_names:
+			options_dict[t].close_menu()
+			
+	def get_rules(self):
+		pass
+		
+	def get_flags(self):
+		pass
+
+##############################Menu Objects#####################################	
+type_dict = {"textbox" : textbox,
+		"lable" : label,
+		"listcontrol" : listctrl,
+		"checkbox" : checkbox}
+
+def get_menu_obj(node):
+	global type_dict
+	if node.nodeName == "options" 
+		and not node.hasAttribute("type"):
+		return submenu(node)
+	else:
+		try:
+			return type_dict[node.getAttribute("type")](node)
+		except KeyError:
+			raise UnknownNode(node.nodeName,node.getAttribute("type"))
+
+class menuobj:
+	def __init__(self,node):
+		pass
+
+	def open_menu(self):
+		pass
+		
+	def close_menu(self):
+		pass
+		
+	def get_compile_option(self):
+		pass
+		
+class submenu(menuobj):
+	def __init__(self,node):
+		self.node = node
+		self.text = node.getAttribute("text")
+		self.menu_objs = []
+		for t in node.childNodes:
+			if isinstance(t,minidom.Element):
+				info = get_menu_obj(t)
+				menu_info.append(info)
+
+	def open_menu(self):
+		self.sub_menu = []
+		for t in self.menu_objs:
+			self.sub_menu.append(t.open_menu())
+		self.menu = ["submenu",self.text,self.sub_menu]
+		return self.menu
+		
+	def close_menu(self):
+		for t in self.menu_objs:
+			t.close_menu()
+		
+	def get_compile_option(self):
+		ret = ""
+		for t in self.menu_objs:
+			option = t.get_compile_option()
+			if option != "":
+				if ret != "":
+					ret = ret + " "
+				ret = ret + option
+		return ret
+	
+class label(menuobj):
+	def __init__(self,node):
+		self.text = node.getAttribute("text")
+
+	def open_menu(self):
+		return ["lable",self.text,None]
+		
+	def get_compile_option(self):
+		return ""
+	
+class textbox(menuobj):
+	def __init__(self,node):
+		self.node = node
+		self.text = node.nodeName
+		self.value = node.childNodes[0].nodeValue.strip()
+
+	def open_menu(self):
+		self.menu = ["textbox",self.text,self.value]
+		return self.menu
+		
+	def close_menu(self):
+		self.value = self.menu[2]
+		self.node.childNodes[0].nodeValue = self.value
+		
+	def get_compile_option(self):
+		return "%s = %s"%(self.text,self.value)
+	
+class listctrl(menuobj):
+	def __init__(self,node):
+		self.node = node
+		self.text = node.getAttribute("text")
+		self.value = int(node.getAttribute("value"))
+		self.macro = node.getAttribute("macro")
+		self.options = node.childNodes[0].nodeValue.split()
+
+	def open_menu(self):
+		self.menu = ["listcontrol",self.text,[self.options,self.value]]
+		return self.menu
+		
+	def close_menu(self):
+		self.value = self.menu[2][1]
+		self.node.setAttribute("value",str(self.value))
+		
+	def get_compile_option(self):
+		return "%s%d"%(self.macro,self.value)
+	
+class checkbox(menuobj):
+	def __init__(self,node):
+		self.node = node
+		self.text = node.getAttribute("text")
+		self.value = bool(node.getAttribute("value"))
+		self.macro = node.getAttribute("macro")
+
+	def open_menu(self):
+		self.menu = ["checkbox",self.text,self.value]
+		return self.menu
+		
+	def close_menu(self):
+		self.value = self.menu[2]
+		self.node.setAttribute("value",str(self.value))
+		
+	def get_compile_option(self):
+		if self.value:
+			return self.macro
+		else:
+			return ""
