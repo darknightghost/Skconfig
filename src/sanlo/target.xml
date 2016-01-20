@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <target>
-	<build>
+	<build  objdir="" output="">
 		<arch name="amd64">
 			<!--Build options,projects's private options can override them-->
 			<AS type="textbox">gcc</AS>
@@ -12,10 +12,9 @@
 			<LD type="textbox">ld</LD>
 			<LDFLAGS type="textbox"></LDFLAGS>
 			<LDRULE></LDRULE>
-			<CPP type="textbox">gcc -M</CPP>
-			<CPPRULE></CPPRULE>
-			<prebuild-command  type="textbox"/>
-			<afterbuild-command  type="textbox"/>
+			<DEP type="textbox">gcc</DEP>
+			<DEPRULE>-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\//' $@` &gt; $@</DEPRULE>
+			<AFTER  type="textbox"/>
 		</arch>
 	</build>
 	<menu>

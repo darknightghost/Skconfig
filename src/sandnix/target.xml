@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <target>
-	<build />
+	<build objdir="" output="" />
 	<menu>
 		<options text="sandnix menu1">
 			<option type="lable" text="group1" />

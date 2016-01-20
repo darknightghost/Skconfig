@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <target>
-	<build />
+	<build objdir="" output="" />
 	<menu>
 		<options text="drivers">
 			<target name="sanlo" build="true" src="ata" />

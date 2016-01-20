@@ -18,15 +18,19 @@
 from xml.dom import minidom
 from cfg_excpt import *
 
+#target_list : [[path,options,[children]],[path,options,[children]],...]
+
 class cfg:
 	def __init__(self,path):
 		self.file = open(path,"rw")
 		self.dom = minidom.parse(self.file)
 		root = self.dom.documentElement
+		self.title = root.getAttribute("name")
 		
 		#Analyse architectures
 		#{"archname" : [archname,obj],"archname" : [archobj],...}
 		self.build_node = root.getElementsByTagName("build")[0]
+		self.build_arch = self.build_node.getAttribute("actived")
 		arch_nodes = self.build_node.getElementsByTagName("arch")
 		self.archs = {}
 		for t in arch_nodes:
@@ -47,13 +51,45 @@ class cfg:
 
 	def __del__(self):
 		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		self.file.close()
 		return
+		
+	def get_title(self):
+		return self.title
 
 	def open_menu(self):
-		pass
+		self.arch_list = ["listcontrol","Archtecture",[[],0]]
+		self.menu = []
+		for t in self.archs.keys():
+			self.arch_list[2][0].append(t)
+			self.arch_menu.append(self.archs[t].open_menu())
+			if t == self.build_arch:
+				self.arch_list[2][1] = len(self.arch_list[2][0])
+				
+		self.menu = [["lable","Architectures",None],
+			self.arch_list,
+			["submenu","Architecture Settings",self.arch_menu],
+			["lable","Targets",None]]
+		
+		for t in self.targets:
+			self.menu.append(t.open_menu())
 		
 	def close_menu(self):
-		pass
+		self.build_arch = self.arch_list[2][0][self.arch_list[2][1]]
+		self.build_node.setAttribute("actived",self.build_arch)
+		for t in self.archs.keys():
+			self.archs[t].close_menu()
+		
+		for t in self.targets:
+			t.close_menu()
+			
+		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		
+	def get_build_options(self,target_list):
+		arch = self.archs[self.build_arch]
+			for t in self.targets:
+				t.get_build_options(target_list,arch)
+		return
 
 ################################Target#########################################			
 class target:
@@ -62,7 +98,8 @@ class target:
 		self.path = "%s/%s"%(os.getcwd(),node.getAttribute("src"))
 		old_path = os.getcwd()
 		os.chdir(self.path)
-		self.name = node.getAttribute("node")
+		self.name = node.getAttribute("name")
+		self.enable_build = node.getAttribute("build") == "true"
 		self.file = open("target.xml","rw")
 		self.dom = minidom.parse(self.file)
 		root = self.dom.documentElement
@@ -70,6 +107,8 @@ class target:
 		#Analyse architectures
 		#{"archname" : [archname,obj],"archname" : [archobj],...}
 		build_node = root.getElementsByTagName("build")[0]
+		self.objdir = build_node.getAttribute("objdir")
+		self.output = build_node.getAttribute("output")
 		arch_nodes = build_node.getElementsByTagName("arch")
 		self.archs = {}
 		for t in arch_nodes:
@@ -86,26 +125,57 @@ class target:
 		for t in menu_node.childNodes:
 			if isinstance(t,minidom.Element):
 				info = get_menu_obj(t)
-				menu_objs.append(info)
+				self.menu_objs.append(info)
 
 		os.chdir(old_path)
 		return
 		
 	def __del__(self):
 		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		self.file.close()
 		return
 		
 	def open_menu(self):
-		pass
+		self.build_menu = ["textbox","Build this target.",self.enable_build]
+		self.submenu = [self.build_menu]
+		self.submenu.append(["lable","Architectures:",None])
+		for t in self.archs.keys():
+			self.submenu.append(self.archs[t].open_menu())
+		self.submenu.append(["lable","Build Options:",None])
+		for t in self.menu_objs:
+			self.submenu.append(t.open_menu())
+		self.menu = ["submenu","Target : %s"%(self.name),self.submenu]
+		return self.menu
 		
 	def close_menu(self):
+		self.enable_build = self.build_menu[2]
+		node.setAttribute("build",str(self.enable_build).lower())
+		for t in self.archs.keys():
+			self.archs[t].close_menu()
+		for t in self.menu_objs:
+			t.close_menu()
 		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		
+	def get_build_options(self,target_list,arch):
+		children = []
+		for t in self.menu_objs:
+			option = t.get_build_options(children,arch)
+			if t != "":
+				macros = "%s %s"%(macros,option)
+		try:
+			options = self.archs[arch.name].get_build_options(macros)
+		except KeyError:
+			options = arch.get_build_options(macros)
+		options = "%s\nARCH = %s\n"%(options,arch.name)
+		options = "%sOBJDIR = %s\nOUTPUT = %s\nTARGET = %s\n"%(options,self.objdir,self.output,self.name)
+		target_list.append([self.path,options,children])
+		return ""
+
 
 ##################################Arch#######################################	
 class arch:
 	self.option_names = ["AS","ASFLAGS","ASRULE","CC","CFLAGS","CCRULE","LD",
-			"LDFLAGS","LDRULE","CPP","CPPRULE","prebuild-command",
-			"afterbuild-command"]
+			"LDFLAGS","LDRULE","DEP","DEPRULE","AFTER"]
 	def __init__(self,node):
 		self.node = node
 		self.name = node.getAttribute("name")
@@ -118,6 +188,7 @@ class arch:
 			except IndexError:
 				raise ElementNotFound(t)
 				
+				
 			info_obj = get_menu_obj(info_node)
 			self.options_dict[t] = info_obj
 
@@ -127,16 +198,21 @@ class arch:
 		for t in self.option_names:
 			self.submenu.append(options_dict[t].open_menu())
 		self.menu = ["submenu",self.name,self.submenu]
+		return 
 		
 	def close_menu(self):
 		for t in self.option_names:
 			options_dict[t].close_menu()
 			
-	def get_rules(self):
-		pass
-		
-	def get_flags(self):
-		pass
+	def get_build_options(self,options):
+		ret = ""
+		for t in self.option_names:
+			ret = ret + self.options_dict[t].get_build_options(None,self.name)
+			if t in ["ASFLAGS","CFLAGS"]:
+				if options != "":
+					ret = "%s %s"%(ret,options)
+			ret = ret + "\n"
+		return ret
 
 ##############################Menu Objects#####################################	
 type_dict = {"textbox" : textbox,
@@ -165,7 +241,7 @@ class menuobj:
 	def close_menu(self):
 		pass
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		pass
 		
 class submenu(menuobj):
@@ -189,10 +265,10 @@ class submenu(menuobj):
 		for t in self.menu_objs:
 			t.close_menu()
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		ret = ""
 		for t in self.menu_objs:
-			option = t.get_compile_option()
+			option = t.get_build_options(target_list,arch)
 			if option != "":
 				if ret != "":
 					ret = ret + " "
@@ -206,7 +282,7 @@ class label(menuobj):
 	def open_menu(self):
 		return ["lable",self.text,None]
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		return ""
 	
 class textbox(menuobj):
@@ -223,7 +299,7 @@ class textbox(menuobj):
 		self.value = self.menu[2]
 		self.node.childNodes[0].nodeValue = self.value
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		return "%s = %s"%(self.text,self.value)
 	
 class listctrl(menuobj):
@@ -242,14 +318,14 @@ class listctrl(menuobj):
 		self.value = self.menu[2][1]
 		self.node.setAttribute("value",str(self.value))
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		return "%s%d"%(self.macro,self.value)
 	
 class checkbox(menuobj):
 	def __init__(self,node):
 		self.node = node
 		self.text = node.getAttribute("text")
-		self.value = bool(node.getAttribute("value"))
+		self.value = node.getAttribute("value") == "true"
 		self.macro = node.getAttribute("macro")
 
 	def open_menu(self):
@@ -258,9 +334,9 @@ class checkbox(menuobj):
 		
 	def close_menu(self):
 		self.value = self.menu[2]
-		self.node.setAttribute("value",str(self.value))
+		self.node.setAttribute("value",str(self.value).lower())
 		
-	def get_compile_option(self):
+	def get_build_options(self,target_list,arch):
 		if self.value:
 			return self.macro
 		else:

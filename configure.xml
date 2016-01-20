@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><skconfig>	
+<?xml version="1.0" encoding="utf-8"?><skconfig name="Sandnix 0.0.2 Configuration">	
 		<!--Architecture to build-->	
 		<build actived="x86">		
 				<!--Supported Architecture-->		
@@ -10,12 +10,11 @@
 						<CC type="textbox">gcc</CC>	
 						<CFLAGS type="textbox">-m32 -c</CFLAGS>
 						<CCRULE></CCRULE>
-						<LD type="textbox">ld</LD>			
+						<LD type="textbox">ld</LD>
 						<LDFLAGS type="textbox" />			
-						<CPP type="textbox">gcc -M</CPP>		
-						<CPPRULE></CPPRULE>	
-						<prebuild-command type="textbox" />			
-						<afterbuild-command type="textbox" />			
+						<DEP type="textbox">gcc</DEP>
+						<DEPRULE>-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\/$(ARCH)\//' $@` &gt; $@</DEPRULE>
+						<AFTER type="textbox" />			
 				</arch>
 				<arch name="amd64">			
 						<AS type="textbox">gcc</AS>			
@@ -24,9 +23,9 @@
 						<CFLAGS type="textbox">-c</CFLAGS>			
 						<LD type="textbox">ld</LD>			
 						<LDFLAGS type="textbox" />			
-						<CPP type="textbox">gcc -M</CPP>			
-						<prebuild-command type="textbox" />			
-						<afterbuild-command type="textbox" />			
+						<DEP type="textbox">gcc</DEP>
+						<DEPRULE>-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\/$(ARCH)\//' $@` &gt; $@</DEPRULE>	
+						<AFTER type="textbox" />			
 				</arch>		
 		</build>	
 		<targets>		
