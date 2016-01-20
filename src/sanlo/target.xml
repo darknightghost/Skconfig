@@ -2,19 +2,19 @@
 <target>
 	<build  objdir="" output="">
 		<arch name="amd64">
-			<!--Build options,projects's private options can override them-->
-			<AS type="textbox">gcc</AS>
+			<!--Build options,projects's private options can override them-->			
+			<AS type="textbox">gcc</AS>			
 			<ASFLAGS type="textbox">-m32 -c</ASFLAGS>
-			<ASRULE></ASRULE>
-			<CC type="textbox">gcc</CC>
+			<ASRULE type="textbox"></ASRULE>
+			<CC type="textbox">gcc</CC>	
 			<CFLAGS type="textbox">-m32 -c</CFLAGS>
-			<CCRULE></CCRULE>
+			<CCRULE type="textbox"></CCRULE>
 			<LD type="textbox">ld</LD>
-			<LDFLAGS type="textbox"></LDFLAGS>
-			<LDRULE></LDRULE>
+			<LDFLAGS type="textbox" />
+			<LDRULE type="textbox" />		
 			<DEP type="textbox">gcc</DEP>
-			<DEPRULE>-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\//' $@` &gt; $@</DEPRULE>
-			<AFTER  type="textbox"/>
+			<DEPRULE type="textbox">-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\/$(ARCH)\//' $@` &gt; $@</DEPRULE>
+			<AFTER type="textbox" />			
 		</arch>
 	</build>
 	<menu>

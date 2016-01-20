@@ -17,6 +17,7 @@
 
 from xml.dom import minidom
 from cfg_excpt import *
+import os
 
 #target_list : [[path,options,[children]],[path,options,[children]],...]
 
@@ -60,9 +61,10 @@ class cfg:
 	def open_menu(self):
 		self.arch_list = ["listcontrol","Archtecture",[[],0]]
 		self.menu = []
+		self.arch_menu = []
 		for t in self.archs.keys():
 			self.arch_list[2][0].append(t)
-			self.arch_menu.append(self.archs[t].open_menu())
+			self.arch_menu.append(self.archs[t][1].open_menu())
 			if t == self.build_arch:
 				self.arch_list[2][1] = len(self.arch_list[2][0])
 				
@@ -73,12 +75,14 @@ class cfg:
 		
 		for t in self.targets:
 			self.menu.append(t.open_menu())
+			
+		return self.menu
 		
 	def close_menu(self):
 		self.build_arch = self.arch_list[2][0][self.arch_list[2][1]]
 		self.build_node.setAttribute("actived",self.build_arch)
 		for t in self.archs.keys():
-			self.archs[t].close_menu()
+			self.archs[t][1].close_menu()
 		
 		for t in self.targets:
 			t.close_menu()
@@ -87,8 +91,8 @@ class cfg:
 		
 	def get_build_options(self,target_list):
 		arch = self.archs[self.build_arch]
-			for t in self.targets:
-				t.get_build_options(target_list,arch)
+		for t in self.targets:
+			t.get_build_options(target_list,arch)
 		return
 
 ################################Target#########################################			
@@ -113,10 +117,10 @@ class target:
 		self.archs = {}
 		for t in arch_nodes:
 			info = arch(t)
-			if info[0] in self.archs.keys():
+			if info.name in self.archs.keys():
 				raise ConflictedArchName(info[0])
 			else:
-				self.archs[info[0]] = info
+				self.archs[info.name] = info
 				
 		#Analyse menu
 		#[menu-object,menu-object,...]
@@ -136,7 +140,7 @@ class target:
 		return
 		
 	def open_menu(self):
-		self.build_menu = ["textbox","Build this target.",self.enable_build]
+		self.build_menu = ["checkbox","Build this target.",self.enable_build]
 		self.submenu = [self.build_menu]
 		self.submenu.append(["lable","Architectures:",None])
 		for t in self.archs.keys():
@@ -149,7 +153,7 @@ class target:
 		
 	def close_menu(self):
 		self.enable_build = self.build_menu[2]
-		node.setAttribute("build",str(self.enable_build).lower())
+		self.node.setAttribute("build",str(self.enable_build).lower())
 		for t in self.archs.keys():
 			self.archs[t].close_menu()
 		for t in self.menu_objs:
@@ -174,7 +178,7 @@ class target:
 
 ##################################Arch#######################################	
 class arch:
-	self.option_names = ["AS","ASFLAGS","ASRULE","CC","CFLAGS","CCRULE","LD",
+	option_names = ["AS","ASFLAGS","ASRULE","CC","CFLAGS","CCRULE","LD",
 			"LDFLAGS","LDRULE","DEP","DEPRULE","AFTER"]
 	def __init__(self,node):
 		self.node = node
@@ -196,13 +200,13 @@ class arch:
 	def open_menu(self):
 		self.submenu = []
 		for t in self.option_names:
-			self.submenu.append(options_dict[t].open_menu())
+			self.submenu.append(self.options_dict[t].open_menu())
 		self.menu = ["submenu",self.name,self.submenu]
-		return 
+		return self.menu
 		
 	def close_menu(self):
 		for t in self.option_names:
-			options_dict[t].close_menu()
+			self.options_dict[t].close_menu()
 			
 	def get_build_options(self,options):
 		ret = ""
@@ -214,22 +218,7 @@ class arch:
 			ret = ret + "\n"
 		return ret
 
-##############################Menu Objects#####################################	
-type_dict = {"textbox" : textbox,
-		"lable" : label,
-		"listcontrol" : listctrl,
-		"checkbox" : checkbox}
-
-def get_menu_obj(node):
-	global type_dict
-	if node.nodeName == "options" 
-		and not node.hasAttribute("type"):
-		return submenu(node)
-	else:
-		try:
-			return type_dict[node.getAttribute("type")](node)
-		except KeyError:
-			raise UnknownNode(node.nodeName,node.getAttribute("type"))
+##############################Menu Objects#####################################
 
 class menuobj:
 	def __init__(self,node):
@@ -252,7 +241,7 @@ class submenu(menuobj):
 		for t in node.childNodes:
 			if isinstance(t,minidom.Element):
 				info = get_menu_obj(t)
-				menu_info.append(info)
+				self.menu_objs.append(info)
 
 	def open_menu(self):
 		self.sub_menu = []
@@ -275,7 +264,7 @@ class submenu(menuobj):
 				ret = ret + option
 		return ret
 	
-class label(menuobj):
+class lable(menuobj):
 	def __init__(self,node):
 		self.text = node.getAttribute("text")
 
@@ -289,7 +278,10 @@ class textbox(menuobj):
 	def __init__(self,node):
 		self.node = node
 		self.text = node.nodeName
-		self.value = node.childNodes[0].nodeValue.strip()
+		try:
+			self.value = node.childNodes[0].nodeValue.strip()
+		except IndexError:
+			self.value = ""
 
 	def open_menu(self):
 		self.menu = ["textbox",self.text,self.value]
@@ -297,7 +289,12 @@ class textbox(menuobj):
 		
 	def close_menu(self):
 		self.value = self.menu[2]
-		self.node.childNodes[0].nodeValue = self.value
+		try:
+			self.node.childNodes[0].nodeValue = self.value
+		except IndexError:
+			t = minidom.Text()
+			self.node.childNodes.append(t)
+			t.nodeValue = self.value
 		
 	def get_build_options(self,target_list,arch):
 		return "%s = %s"%(self.text,self.value)
@@ -341,3 +338,20 @@ class checkbox(menuobj):
 			return self.macro
 		else:
 			return ""
+			
+type_dict = {"textbox" : textbox,
+		"lable" : lable,
+		"listcontrol" : listctrl,
+		"checkbox" : checkbox}
+
+def get_menu_obj(node):
+	global type_dict
+	if node.nodeName == "options" and not node.hasAttribute("type"):
+		return submenu(node)
+	elif node.nodeName == "target" and not node.hasAttribute("type"):
+		return target(node)
+	else:
+		try:
+			return type_dict[node.getAttribute("type")](node)
+		except KeyError:
+			raise UnknownNode(node.nodeName,node.getAttribute("type"))

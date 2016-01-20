@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 '''
@@ -283,6 +283,8 @@ class menu:
 				indent = self.control_dict[menu[ctrl_index][0]][1]
 			except KeyError:
 				raise ControlTypeError(menu[ctrl_index][0])
+			except TypeError:
+				raise TypeError(str(menu))
 				
 			#Get control height
 			ctrl_height = ctrl.get_size().height

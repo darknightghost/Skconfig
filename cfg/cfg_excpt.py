@@ -44,4 +44,3 @@ class UnknownNode(Exception):
 
 	def __str__(self):
 		return "Unknow name of node,name=%s,type=%s."%(self.name,self.nodetype)
-
