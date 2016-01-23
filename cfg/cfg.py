@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 '''
@@ -23,19 +23,19 @@ import os
 
 class cfg:
 	def __init__(self,path):
-		self.file = open(path,"rw")
+		self.file = open(path,"r+")
 		self.dom = minidom.parse(self.file)
 		root = self.dom.documentElement
-		self.title = root.getAttribute("name")
+		self.title = root.getAttribute("name").encode('utf-8')
 		
 		#Analyse architectures
 		#{"archname" : [archname,obj],"archname" : [archobj],...}
 		self.build_node = root.getElementsByTagName("build")[0]
-		self.build_arch = self.build_node.getAttribute("actived")
+		self.build_arch = self.build_node.getAttribute("actived").encode('utf-8')
 		arch_nodes = self.build_node.getElementsByTagName("arch")
 		self.archs = {}
 		for t in arch_nodes:
-			info = [t.getAttribute("name"),arch(t)]
+			info = [t.getAttribute("name").encode('utf-8'),arch(t)]
 			if info[0] in self.archs.keys():
 				raise ConflictedArchName(info[0])
 			else:
@@ -51,7 +51,6 @@ class cfg:
 		return
 
 	def __del__(self):
-		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
 		self.file.close()
 		return
 		
@@ -66,7 +65,7 @@ class cfg:
 			self.arch_list[2][0].append(t)
 			self.arch_menu.append(self.archs[t][1].open_menu())
 			if t == self.build_arch:
-				self.arch_list[2][1] = len(self.arch_list[2][0])
+				self.arch_list[2][1] = len(self.arch_list[2][0]) - 1
 				
 		self.menu = [["lable","Architectures",None],
 			self.arch_list,
@@ -86,8 +85,10 @@ class cfg:
 		
 		for t in self.targets:
 			t.close_menu()
-			
-		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		
+		self.file.seek(0,0)
+		self.file.truncate(0)
+		self.dom.writexml(self.file,addindent='', newl='',encoding='utf-8')
 		
 	def get_build_options(self,target_list):
 		arch = self.archs[self.build_arch]
@@ -99,20 +100,20 @@ class cfg:
 class target:
 	def __init__(self,node):
 		self.node = node
-		self.path = "%s/%s"%(os.getcwd(),node.getAttribute("src"))
+		self.path = "%s/%s"%(os.getcwd(),node.getAttribute("src").encode('utf-8'))
 		old_path = os.getcwd()
 		os.chdir(self.path)
-		self.name = node.getAttribute("name")
-		self.enable_build = node.getAttribute("build") == "true"
-		self.file = open("target.xml","rw")
+		self.name = node.getAttribute("name").encode('utf-8')
+		self.enable_build = node.getAttribute("build").encode('utf-8') == "true"
+		self.file = open("target.xml","r+")
 		self.dom = minidom.parse(self.file)
 		root = self.dom.documentElement
 		
 		#Analyse architectures
 		#{"archname" : [archname,obj],"archname" : [archobj],...}
 		build_node = root.getElementsByTagName("build")[0]
-		self.objdir = build_node.getAttribute("objdir")
-		self.output = build_node.getAttribute("output")
+		self.objdir = build_node.getAttribute("objdir").encode('utf-8')
+		self.output = build_node.getAttribute("output").encode('utf-8')
 		arch_nodes = build_node.getElementsByTagName("arch")
 		self.archs = {}
 		for t in arch_nodes:
@@ -135,7 +136,6 @@ class target:
 		return
 		
 	def __del__(self):
-		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
 		self.file.close()
 		return
 		
@@ -158,7 +158,9 @@ class target:
 			self.archs[t].close_menu()
 		for t in self.menu_objs:
 			t.close_menu()
-		self.dom.writexml(self.file,addindent='\t', newl='',encoding='utf-8')
+		self.file.seek(0,0)
+		self.file.truncate(0)
+		self.dom.writexml(self.file,addindent='', newl='',encoding='utf-8')
 		
 	def get_build_options(self,target_list,arch):
 		children = []
@@ -182,7 +184,7 @@ class arch:
 			"LDFLAGS","LDRULE","DEP","DEPRULE","AFTER"]
 	def __init__(self,node):
 		self.node = node
-		self.name = node.getAttribute("name")
+		self.name = node.getAttribute("name").encode('utf-8')
 		#{name : obj,name : obj,...}
 		self.options_dict = {}
 
@@ -236,7 +238,7 @@ class menuobj:
 class submenu(menuobj):
 	def __init__(self,node):
 		self.node = node
-		self.text = node.getAttribute("text")
+		self.text = node.getAttribute("text").encode('utf-8')
 		self.menu_objs = []
 		for t in node.childNodes:
 			if isinstance(t,minidom.Element):
@@ -266,7 +268,7 @@ class submenu(menuobj):
 	
 class lable(menuobj):
 	def __init__(self,node):
-		self.text = node.getAttribute("text")
+		self.text = node.getAttribute("text").encode('utf-8')
 
 	def open_menu(self):
 		return ["lable",self.text,None]
@@ -277,9 +279,9 @@ class lable(menuobj):
 class textbox(menuobj):
 	def __init__(self,node):
 		self.node = node
-		self.text = node.nodeName
+		self.text = node.nodeName.encode('utf-8')
 		try:
-			self.value = node.childNodes[0].nodeValue.strip()
+			self.value = node.childNodes[0].nodeValue.encode('utf-8').strip()
 		except IndexError:
 			self.value = ""
 
@@ -290,11 +292,11 @@ class textbox(menuobj):
 	def close_menu(self):
 		self.value = self.menu[2]
 		try:
-			self.node.childNodes[0].nodeValue = self.value
+			self.node.childNodes[0].nodeValue = self.value.decode('utf-8')
 		except IndexError:
 			t = minidom.Text()
 			self.node.childNodes.append(t)
-			t.nodeValue = self.value
+			t.nodeValue = self.value.decode('utf-8')
 		
 	def get_build_options(self,target_list,arch):
 		return "%s = %s"%(self.text,self.value)
@@ -302,10 +304,10 @@ class textbox(menuobj):
 class listctrl(menuobj):
 	def __init__(self,node):
 		self.node = node
-		self.text = node.getAttribute("text")
-		self.value = int(node.getAttribute("value"))
-		self.macro = node.getAttribute("macro")
-		self.options = node.childNodes[0].nodeValue.split()
+		self.text = node.getAttribute("text").encode('utf-8')
+		self.value = int(node.getAttribute("value").encode('utf-8'))
+		self.macro = node.getAttribute("macro").encode('utf-8')
+		self.options = node.childNodes[0].nodeValue.encode('utf-8').split()
 
 	def open_menu(self):
 		self.menu = ["listcontrol",self.text,[self.options,self.value]]
@@ -321,9 +323,9 @@ class listctrl(menuobj):
 class checkbox(menuobj):
 	def __init__(self,node):
 		self.node = node
-		self.text = node.getAttribute("text")
-		self.value = node.getAttribute("value") == "true"
-		self.macro = node.getAttribute("macro")
+		self.text = node.getAttribute("text").encode('utf-8')
+		self.value = node.getAttribute("value").encode('utf-8') == "true"
+		self.macro = node.getAttribute("macro").encode('utf-8')
 
 	def open_menu(self):
 		self.menu = ["checkbox",self.text,self.value]
@@ -346,12 +348,12 @@ type_dict = {"textbox" : textbox,
 
 def get_menu_obj(node):
 	global type_dict
-	if node.nodeName == "options" and not node.hasAttribute("type"):
+	if node.nodeName.encode('utf-8') == "options" and not node.hasAttribute("type"):
 		return submenu(node)
-	elif node.nodeName == "target" and not node.hasAttribute("type"):
+	elif node.nodeName.encode('utf-8') == "target" and not node.hasAttribute("type"):
 		return target(node)
 	else:
 		try:
-			return type_dict[node.getAttribute("type")](node)
+			return type_dict[node.getAttribute("type").encode('utf-8')](node)
 		except KeyError:
-			raise UnknownNode(node.nodeName,node.getAttribute("type"))
+			raise UnknownNode(node.nodeName.encode('utf-8'),node.getAttribute("type").encode('utf-8'))

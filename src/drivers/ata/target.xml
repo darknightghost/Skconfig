@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<target>
-	<build objdir="" output="" />
+<?xml version="1.0" encoding="utf-8"?><target>
+	<build objdir="" output=""/>
 	<menu>
 		<options text="ata menu1">
-			<option type="lable" text="group1" />
-			<option type="listcontrol" text="list1" macro="aaa" value="0">
+			<option text="group1" type="lable"/>
+			<option macro="aaa" text="list1" type="listcontrol" value="2">
 				aaa
 				bbb
 				ccc
 			</option>
-			<option type="lable" text="group2" />
-			<option type="checkbox" text="chk1" macro="bbB" value="true" />
-			<option type="checkbox" text="chk2" macro= "ccc" value="false" />
+			<option text="group2" type="lable"/>
+			<option macro="bbB" text="chk1" type="checkbox" value="true"/>
+			<option macro="ccc" text="chk2" type="checkbox" value="true"/>
 		</options>
 		<options text="test menu2">
 		</options>

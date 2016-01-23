@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<target>
-	<build  objdir="" output="">
+<?xml version="1.0" encoding="utf-8"?><target>
+	<build objdir="" output="">
 		<arch name="amd64">
 			<!--Build options,projects's private options can override them-->			
 			<AS type="textbox">gcc</AS>			
@@ -10,24 +9,24 @@
 			<CFLAGS type="textbox">-m32 -c</CFLAGS>
 			<CCRULE type="textbox"></CCRULE>
 			<LD type="textbox">ld</LD>
-			<LDFLAGS type="textbox" />
-			<LDRULE type="textbox" />		
+			<LDFLAGS type="textbox"></LDFLAGS>
+			<LDRULE type="textbox"></LDRULE>		
 			<DEP type="textbox">gcc</DEP>
 			<DEPRULE type="textbox">-MM -o $@ $&lt;;echo `sed 's/^/$(OBJDIR)\/$(ARCH)\//' $@` &gt; $@</DEPRULE>
-			<AFTER type="textbox" />			
+			<AFTER type="textbox"></AFTER>			
 		</arch>
 	</build>
 	<menu>
 		<options text="sanlo menu1">
-			<option type="lable" text="group1" />
-			<option type="listcontrol" text="list1" macro="-Daaa=" value="0">
+			<option text="group1" type="lable"/>
+			<option macro="-Daaa=" text="list1" type="listcontrol" value="2">
 				aaa
 				bbb
 				ccc
 			</option>
-			<option type="lable" text="group2" />
-			<option type="checkbox" text="chk1" macro="-DbbB" value="true" />
-			<option type="checkbox" text="chk2" macro= "-Dccc" value="false" />
+			<option text="group2" type="lable"/>
+			<option macro="-DbbB" text="chk1" type="checkbox" value="false"/>
+			<option macro="-Dccc" text="chk2" type="checkbox" value="true"/>
 		</options>
 		<options text="test menu2">
 		</options>
