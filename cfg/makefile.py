@@ -16,106 +16,116 @@
 '''
 
 from cfg import *
+from cfg_excpt import *
 import os
 
 def configure(path):
 	configure = cfg(path)
 	target_list = []
-	configure.get_build_options(target_list)
-	print("Creating Makefile...")
+	arch = configure.get_build_options(target_list)
+	
+	for t in target_list:
+		create_target_makefile(t,arch)
+
+	print("Creating %s/Makefile..."%(os.path.dirname(path)))
 	try:
 		make_file = open("Makefile","x")
-	except FileExistsError:
+	except:
 		make_file = open("Makefile","w")
-		
+	
+	make_file.write(".PHONY : all clean delete rebuild\n")
 	#all
-	make_file.wrtie("all :\n")
+	make_file.write("all :\n")
 	for t in target_list:
-		create_target_makefile(t)
-		make_file.wrtie("\tmake -f \"%s\" all\n")
+		make_file.write("\tcd %s;make all\n"%(t[0]))
 	
 	#clean
-	make_file.wrtie("clean :\n")
+	make_file.write("clean :\n")
 	for t in target_list:
-		make_file.wrtie("\tmake -f \"%s\" clean\n")
+		make_file.write("\tcd %s;make clean\n"%(t[0]))
 		
 	#delete
-	make_file.wrtie("delete :\n")
+	make_file.write("delete :\n")
 	for t in target_list:
-		make_file.wrtie("\tmake -f \"%s\" delete\n")
+		make_file.write("\tcd %s;make delete\n"%(t[0]))
 		
 	#rebuild
-	make_file.wrtie("rebuild :\n")
+	make_file.write("rebuild :\n")
 	for t in target_list:
-		make_file.wrtie("\tmake -f \"%s\" rebuild\n")
+		make_file.write("\tcd %s;make rebuild\n"%(t[0]))
 	return
 
-def create_target_makefile(target):
+def create_target_makefile(target,arch):
 	#Get config
 	path = target[0]
 	options = target[1]
 	old_path = os.getcwd()
 	os.chdir(path)
-	print("Creating Makefile...")
+	print("Creating %s/Makefile..."%(path))
 	try:
 		make_file = open("Makefile","x")
-	except FileExistsError:
+	except:
 		make_file = open("Makefile","w")
 	sources = get_sources(arch)
 	
 	#Create makefile
-	make_file.wrtie(options)
-	make_file.wrtie("all : $(TARGET)\n")
-	
-	#Children
-	subtargets = target[2]
-	make_file.wrtie("$(TARGET) : $(OUTPUT)\n")
-	for t in subtargets:
-		make_file.wrtie("\tmake -f \"%s/Makefile\" all\n"%(t[0]))
-		create_target_makefile(t)
-	make_file.wrtie("\t$(AFTER)\n")
-	
-	#clean
-	make_file.wrtie("clean :")
-	for t in subtargets:
-		make_file.wrtie("\tmake -f \"%s/Makefile\" clean\n"%(t[0]))
-	make_file.wrtie("\trm -r $(OBJDIR)/$(ARCH)\n")
-	
-	#delete
-	make_file.wrtie("delete :")
-	for t in subtargets:
-		make_file.wrtie("\tmake -f \"%s/Makefile\" delete\n"%(t[0]))
-	make_file.wrtie("\trm -r $(OBJDIR)/$(ARCH)\n")
-	make_file.wrtie("\trm -r $(OUTPUT)\n")
-	
-	#rebuild
-	make_file.wrtie("rebuild :")
-	make_file.wrtie("\tmake delete\n")
-	make_file.wrtie("\tmake all\n")
+	make_file.write(options)
 	
 	#Target
 	objs = ""
+	deps = ""
 	#Sources
 	for s in sources:
 		base_name = os.path.splitext(s)[0]
 		ext_name = os.path.splitext(s)[1]
-		make_file.wrtie("sinclude $(OBJDIR)/$(ARCH)/%s.dep\n"%(base_name))
+		make_file.write("sinclude $(OBJDIR)/$(ARCH)/%s.dep\n"%(base_name))
+		#.dep
+		make_file.write("$(OBJDIR)/$(ARCH)/%s.dep : %s\n"%(base_name,s))
+		make_file.write("\tmkdir -p $(dir $@)\n\t$(DEPRULE)\n")
 		objs = "%s$(OBJDIR)/$(ARCH)/%s.o "%(objs,base_name)
-		make_file.wrtie("$(OBJDIR)/$(ARCH)/%s.o : %s\n"%(base_name,s))
+		make_file.write("$(OBJDIR)/$(ARCH)/%s.o : %s\n"%(base_name,s))
+		deps = deps + " " + "$(OBJDIR)/$(ARCH)/%s.dep"%(base_name)
 		if ext_name in [".c"]:
 			#.c
-			make_file.wrtie("\t$(CCRULE)\n")
+			make_file.write("\t$(CCRULE)\n")
 		elif ext_name in [".s",".S"]:
 			#.s,.S
-			make_file.wrtie("\t$(ASRULE)\n")
-		#.dep
-		make_file.wrtie("$(OBJDIR)/$(ARCH)/%s.dep : %s\n"%(base_name,s))
-		make_file.wrtie("\tmkdir -p $(dir $@)\n\t$(DEPRULE)\n")
+			make_file.write("\t$(ASRULE)\n")
 	
 	#Link
-	make_file.wrtie("$(OUTPUT) : %s\n"%(objs))
-	make_file.wrtie("\tmkdir -p $(dir $(OUTPUT))\n")
-	make_file.wrtie("\t$(LDRULE)\n")
+	make_file.write("$(OUTPUT) : %s\n"%(objs))
+	make_file.write("\tmkdir -p $(dir $(OUTPUT))\n")
+	make_file.write("\t$(LDRULE)\n")
+	
+	make_file.write(".PHONY : $(TARGET) all clean delete rebuild\n")
+	make_file.write("all : $(TARGET)\n")
+	
+	#Children
+	subtargets = target[2]
+	make_file.write("$(TARGET) : $(OUTPUT)\n")
+	for t in subtargets:
+		make_file.write("\tmake -f \"%s/Makefile\" all\n"%(t[0]))
+		create_target_makefile(t)
+	make_file.write("\t$(AFTER)\n")
+	make_file.write("\trm -f %s\n"%(deps))
+	
+	#clean
+	make_file.write("clean :\n")
+	for t in subtargets:
+		make_file.write("\tmake -f \"%s/Makefile\" clean\n"%(t[0]))
+	make_file.write("\trm -r $(OBJDIR)/$(ARCH)\n")
+	
+	#delete
+	make_file.write("delete :\n")
+	for t in subtargets:
+		make_file.write("\tmake -f \"%s/Makefile\" delete\n"%(t[0]))
+	make_file.write("\trm -rf $(OBJDIR)/$(ARCH)\n")
+	make_file.write("\trm -rf $(OUTPUT)\n")
+	
+	#rebuild
+	make_file.write("rebuild :\n")
+	make_file.write("\tmake delete\n")
+	make_file.write("\tmake all\n")
 	
 	make_file.close()
 	os.chdir(old_path)
@@ -123,13 +133,13 @@ def create_target_makefile(target):
 	
 def get_sources(arch):
 	f = open("sources","r")
-	ret = r.readlines()
+	ret = f.readlines()
 	f.close()
 	f = open("sources.%s"%(arch),"r")
-	ret = ret + r.readlines()
+	ret = ret + f.readlines()
 	f.close()
 	for i in range(0,len(ret)):
-		ret[i] = ret[i].split()
+		ret[i] = ret[i].split()[0]
 		print("Checking source file \"%s\"..."%(ret[i]))
 		if not os.access(ret[i],os.F_OK):
 			raise FileNotFoundError("Source file \"%s\" missing."%(ret[i]))
