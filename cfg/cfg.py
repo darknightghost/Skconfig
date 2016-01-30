@@ -19,7 +19,7 @@ from xml.dom import minidom
 from cfg_excpt import *
 import os
 
-#target_list : [[path,options,[children]],[path,options,[children]],...]
+#target_list : [[path,options,output,[children]],[path,options,output,[children]],...]
 
 class cfg:
 	def __init__(self,path):
@@ -170,13 +170,15 @@ class target:
 		for t in self.menu_objs:
 			option = t.get_build_options(children,arch)
 			if t != "":
-				macros = "%s %s"%(macros,option)
+				if macros != "":
+					macros = macro + " "
+				macros = macros + option
 		try:
 			options = options + self.archs[arch.name].get_build_options(macros)
 		except KeyError:
 			options = options + arch.get_build_options(macros)
 		options = "%sOBJDIR = %s\nOUTPUT = %s\n"%(options,self.objdir,self.output)
-		target_list.append([self.path,options,children])
+		target_list.append([self.path,options,self.output,children])
 		return ""
 
 
@@ -218,7 +220,7 @@ class arch:
 			ret = ret + self.options_dict[t].get_build_options(None,self.name)
 			if t in ["ASFLAGS","CFLAGS"]:
 				if options != "":
-					ret = "%s %s"%(ret,options)
+					ret = "%s %s -D%s"%(ret,options,self.name.upper())
 			ret = ret + "\n"
 		return ret
 

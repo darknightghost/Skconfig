@@ -71,6 +71,9 @@ def create_target_makefile(target,arch):
 	#Create makefile
 	make_file.write(options)
 	
+	make_file.write(".PHONY : $(TARGET) all clean delete rebuild\n")
+	make_file.write("all : $(TARGET)\n")
+	
 	#Target
 	objs = ""
 	deps = ""
@@ -91,34 +94,37 @@ def create_target_makefile(target,arch):
 		elif ext_name in [".s",".S"]:
 			#.s,.S
 			make_file.write("\t$(ASRULE)\n")
+			
+	#Subtargets
+	subtargets = target[3]
+	for t in subtargets:
+		make_file.write("%s/%s :\n"%(t[0],t[2]))
+		make_file.write("\tcd %s;make all\n"%(t[0]))
+		create_target_makefile(t,arch)
 	
 	#Link
 	make_file.write("$(OUTPUT) : %s\n"%(objs))
 	make_file.write("\tmkdir -p $(dir $(OUTPUT))\n")
 	make_file.write("\t$(LDRULE)\n")
 	
-	make_file.write(".PHONY : $(TARGET) all clean delete rebuild\n")
-	make_file.write("all : $(TARGET)\n")
-	
-	#Children
-	subtargets = target[2]
-	make_file.write("$(TARGET) : $(OUTPUT)\n")
+	#Target
+	make_file.write("$(TARGET) :")
 	for t in subtargets:
-		make_file.write("\tmake -f \"%s/Makefile\" all\n"%(t[0]))
-		create_target_makefile(t)
+		make_file.write(" %s/%s"%(t[0],t[2]))
+	make_file.write(" $(OUTPUT)\n")
 	make_file.write("\t$(AFTER)\n")
 	make_file.write("\trm -f %s\n"%(deps))
 	
 	#clean
 	make_file.write("clean :\n")
 	for t in subtargets:
-		make_file.write("\tmake -f \"%s/Makefile\" clean\n"%(t[0]))
+		make_file.write("\tcd %s;make clean\n"%(t[0]))
 	make_file.write("\trm -r $(OBJDIR)/$(ARCH)\n")
 	
 	#delete
 	make_file.write("delete :\n")
 	for t in subtargets:
-		make_file.write("\tmake -f \"%s/Makefile\" delete\n"%(t[0]))
+		make_file.write("\tcd %s;make delete\n"%(t[0]))
 	make_file.write("\trm -rf $(OBJDIR)/$(ARCH)\n")
 	make_file.write("\trm -rf $(OUTPUT)\n")
 	
