@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 '''
@@ -15,10 +15,22 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from cfg.makefile import *
-import sys
-import os
+class MissingTag(Exception):
+    def __init__(self,path,tag):
+        self.path = path
+        self.tag = tag
+        
+    def __str__(self):
+		return "Tag \"%s\" was required in file \"\"."%(self.tag,
+                                                            self.path)
 
-os.chdir(os.path.dirname(sys.argv[0]))
-configure("./configure.xml")
-
+class MissingAttribute(Exception):
+    def __init__(self,path,tag.attr):
+        self.path = path
+        self.tag = tag
+        self.attr = attr
+        
+    def __str__(self):
+		return "Tag \"%s\" requires attribute \"\" in file \"\"."%(self.tag,
+                                                            self.attr,
+                                                            self.path)
