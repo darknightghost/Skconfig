@@ -21,6 +21,7 @@
 import xml.dom.minidom
 from analyser.target_exceptions import *
 from analyser.arch import *
+from analyser.options import *
 
 class target:
     target_dict = {}
