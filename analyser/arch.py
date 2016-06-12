@@ -23,12 +23,33 @@ from analyser.target_exceptions import *
 from analyser.target import *
 
 class arch:
-    def __init__(self, node):
-        self.name = "x86"
-        pass
+    def __init__(self, node, path, parent = None):
+        self.path = path
+        self.root = node
+        self.load(parent)
+    
+    def __str__(self):
+        ret = "Architecture \"%s\":"%(self.name)
+        ret = ret + "\n%12s: %s"%("name", self.name)
+        ret = ret + "\n"
+        return ret
     
     def close(self):
         pass
 
     def regist(self, dict):
+        dict[self.name] = self
+    
+    def load(self, parent):
+        #name
+        basename = self.root.getAttribute("name").encode('utf-8').decode()
+        if basename == "":
+            raise MissingAttribute(self.path, "arch", "name")
+        if parent != None:
+            self.name = parent.name
+            self.name = self.name + "." + basename
+        else:
+            self.name = basename
+    
+    def restore(self):
         pass

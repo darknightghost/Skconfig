@@ -41,6 +41,9 @@ class target:
         ret = ret + "\n%12s: %s"%("output", self.output)
         ret = ret + "\n%12s: %s"%("outdir", self.outdir)
         ret = ret + "\n%12s: %s"%("middir", self.middir)
+        ret = ret + "\n%12s: %s"%("Actived arch", self.arch_name)
+        for k in self.archs:
+            ret = ret + "\n" + str(self.archs[k])
         return ret
         
     def close(self):
@@ -109,7 +112,7 @@ class target:
             #Scan arch list
             self.archs = {}
             for node in self.archs_node.getElementsByTagName("arch"):
-                current_arch = arch.arch(node)
+                current_arch = arch(node, self.path)
                 current_arch.regist(self.archs)
         
         #Get actived arch
