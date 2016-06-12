@@ -97,10 +97,6 @@ def create_target_makefile(target,arch):
 			
 	#Subtargets
 	subtargets = target[3]
-	for t in subtargets:
-		make_file.write("%s/%s :\n"%(t[0],t[2]))
-		make_file.write("\tcd %s;make all\n"%(t[0]))
-		create_target_makefile(t,arch)
 	
 	#Link
 	make_file.write("$(OUTPUT) : %s\n"%(objs))
@@ -108,10 +104,10 @@ def create_target_makefile(target,arch):
 	make_file.write("\t$(LDRULE)\n")
 	
 	#Target
-	make_file.write("$(TARGET) :")
+	make_file.write("$(TARGET) : $(OUTPUT)\n")
 	for t in subtargets:
-		make_file.write(" %s/%s"%(t[0],t[2]))
-	make_file.write(" $(OUTPUT)\n")
+		make_file.write("\tcd %s;make all\n"%(t[0]))
+		create_target_makefile(t,arch)
 	make_file.write("\t$(AFTER)\n")
 	make_file.write("\trm -f %s\n"%(deps))
 	
@@ -119,7 +115,7 @@ def create_target_makefile(target,arch):
 	make_file.write("clean :\n")
 	for t in subtargets:
 		make_file.write("\tcd %s;make clean\n"%(t[0]))
-	make_file.write("\trm -r $(OBJDIR)/$(ARCH)\n")
+	make_file.write("\trm -rf $(OBJDIR)/$(ARCH)\n")
 	
 	#delete
 	make_file.write("delete :\n")
@@ -139,14 +135,21 @@ def create_target_makefile(target,arch):
 	
 def get_sources(arch):
 	f = open("sources","r")
-	ret = f.readlines()
+	lst = f.readlines()
 	f.close()
 	f = open("sources.%s"%(arch),"r")
-	ret = ret + f.readlines()
+	lst = lst + f.readlines()
 	f.close()
-	for i in range(0,len(ret)):
-		ret[i] = ret[i].split()[0]
-		print("Checking source file \"%s\"..."%(ret[i]))
-		if not os.access(ret[i],os.F_OK):
-			raise FileNotFoundError("Source file \"%s\" missing."%(ret[i]))
+	ret = []
+	for t in lst:
+		try:
+			t = t.split()[0]
+		except IndexError:
+			continue
+		if t[0] == '#' or t[0] == '\n':
+			continue
+		print("Checking source file \"%s\"..."%(t))
+		if not os.access(t,os.F_OK):
+			raise FileNotFoundError("Source file \"%s\" missing."%(t))
+		ret.append(t)
 	return ret
