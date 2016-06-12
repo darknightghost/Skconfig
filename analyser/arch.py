@@ -27,10 +27,13 @@ class arch:
         self.path = path
         self.root = node
         self.load(parent)
+        
     
     def __str__(self):
         ret = "Architecture \"%s\":"%(self.name)
         ret = ret + "\n%12s: %s"%("name", self.name)
+        for k in self.build_dict.keys():
+            ret = ret + "\n%12s: %s"%(k, self.build_dict[k][1])
         ret = ret + "\n"
         return ret
     
@@ -50,6 +53,36 @@ class arch:
             self.name = self.name + "." + basename
         else:
             self.name = basename
+        
+        #Makeflie variables
+        #[node, value]
+        self.build_dict = {"PREV" : None,
+            "DEP" : None,
+            "DEP_COMMAND" : None,
+            "CC" : None,
+            "CFLAGS" : None,
+            "C_COMMAND" : None,
+            "AS" : None,
+            "ASFLAGS" : None,
+            "AS_COMMAND" : None,
+            "LD" : None,
+            "LDFLAGS" : None,
+            "LD_COMMAND" : None,
+            "AFTER" : None}
+        
+        for k in self.build_dict.keys():
+            try:
+                self.build_dict[k] = [self.root.getElementsByTagName(k)[0]]
+            except IndexError:
+                raise ArchMissingTag(self.path, k, self.name)
+            try:
+                self.build_dict[k].append(self.build_dict[k][0].childNodes[0].nodeValue.encode('utf-8').decode())
+            except IndexError:
+                self.build_dict[k].append("")
+                
+        #Sub architectures
+        
+
     
     def restore(self):
         pass

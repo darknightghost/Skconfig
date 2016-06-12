@@ -98,6 +98,8 @@ class target:
             raise MissingAttribute(self.path, "middir", "path")
         
         #Architectures
+        self.archs = {}
+        self.base_archs = []
         try:
             self.archs_node = self.root.getElementsByTagName("archs")[0]
             if actived_arch == None:
@@ -110,10 +112,10 @@ class target:
             
         else:
             #Scan arch list
-            self.archs = {}
             for node in self.archs_node.getElementsByTagName("arch"):
                 current_arch = arch(node, self.path)
                 current_arch.regist(self.archs)
+                self.base_archs.append(current_arch)
         
         #Get actived arch
         try:

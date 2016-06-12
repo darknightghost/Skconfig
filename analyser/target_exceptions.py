@@ -18,31 +18,44 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
+
 class MissingTag(Exception):
-    def __init__(self,path,tag):
-        self.path = path
+    def __init__(self, path, tag):
+        self.path = os.path.abspath(path)
         self.tag = tag
         
     def __str__(self):
-        return "Tag \"%s\" was required in file \"\"."%(self.tag,
+        return "Tag \"%s\" was required in file \"%s\"."%(self.tag,
                                                             self.path)
 
 class MissingAttribute(Exception):
-    def __init__(self,path,tag, attr):
-        self.path = path
+    def __init__(self, path, tag, attr):
+        self.path = os.path.abspath(path)
         self.tag = tag
         self.attr = attr
         
     def __str__(self):
-        return "Tag \"%s\" requires attribute \"\" in file \"\"."%(self.tag,
+        return "Tag \"%s\" requires attribute \"%s\" in file \"%s\"."%(self.tag,
                                                             self.attr,
                                                             self.path)
 
 class MissingArch(Exception):
-    def __init__(self,path, arch):
-        self.path = path
+    def __init__(self, path, arch):
+        self.path = os.path.abspath(path)
         self.arch = arch
         
     def __str__(self):
-        return "Arch \"%s\" was required in file \"\"."%(self.arch,
+        return "Arch \"%s\" was required in file \"%s\"."%(self.arch,
                                                             self.path)
+
+class ArchMissingTag(Exception):
+    def __init__(self,path, tag, arch):
+        self.path = os.path.abspath(path)
+        self.tag = tag
+        self.arch = arch
+        
+    def __str__(self):
+        return "Tag \"%s\" was required by architecture \"%s\" in file \"%s\"."%(self.tag,
+            self.arch,
+            self.path)
