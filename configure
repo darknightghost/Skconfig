@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3 
 # -*- coding: utf-8 -*-
 
 '''
@@ -18,17 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import xml.dom.minidom
-from analyser.target_exceptions import *
-from analyser.target import *
+from analyser import target
 
-class arch:
-    def __init__(self, node):
-        self.name = "x86"
-        pass
-    
-    def close(self):
-        pass
+root_target = target.target("target.xml")
 
-    def regist(self, dict):
-        pass
+print(root_target)

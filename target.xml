@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?><target name="">
-	<!--输出文件名-->
-	<output name="" />
+    <!--ID-->
+    <id value="1" />
+    <!--输出文件名-->
+    <output name="输出文件名" />
     <!--输出目录-->
-	<outdir path="" />
+    <outdir path="输出目录" />
     <!--中间文件目录-->
-    <middir path="" />
+    <middir path="中间文件目录" />
     <!--架构列表-->
     <archs actived="x86">
-    	<arch name="x86">
-        	<!--所有的命令都会被原样写到gnu makefile中,都对应着同名变量-->
+        <arch name="x86">
+            <!--所有的命令都会被原样写到gnu makefile中,都对应着同名变量-->
             <!--留空的会继承父项目/父架构的-->
-        	<PREV>这里是编译前的命令</PREV>
+            <PREV>这里是编译前的命令</PREV>
             <DEP>生成依赖的工具</DEP>
             <DEP_COMMAND>生成依赖的命令</DEP_COMMAND>
             <CC>c编译器</CC>
@@ -24,34 +26,34 @@
             <LD_COMMAND>链接命令</LD_COMMAND>
             <PREV>编译后执行的命令</PREV>
             <sub-archs>
-            	<!--子架构列表,没有留空-->
+                <!--子架构列表,没有留空-->
             </sub-archs>
         </arch>
         <!--其他的架构在这里-->
     </archs>
     <dependencies>
-    	<!--依赖的target的列表-->
-    	<dep path="" />
+        <!--依赖的target的列表-->
+        <dep path="" />
         <dep path="" />
         <dep path="" />
     </dependencies>
     <sub-targets>
-    	<!--子target列表-->
-    	<target enable="true" path="" />
+        <!--子target列表-->
+        <target enable="true" path="" />
     </sub-targets>
     <options>
-    	<!--单选框-->
-    	<option type="checkbox" name="Enable Debigging" value="-g" enable="true" target="CFLAGS|ASFLAGS|LDFLAGS" />
+        <!--单选框-->
+        <option type="checkbox" name="Enable Debigging" value="-g" enable="true" target="CFLAGS|ASFLAGS|LDFLAGS" />
         <!--多选一-->
         <option type="list" name="Bootloader" index="0" target="CFLAGS|ASFLAGS|LDFLAGS">
-        	<item name="grub2" value="-DGRUB" />
+            <item name="grub2" value="-DGRUB" />
             <item name="uboot" value="-DUBOOT" />
         </option>
         <!--单行文本框-->
         <option type="input" name="Comment" marco="-DCOMMENT" value="" />
         <!--菜单-->
         <option type="menu" name="Early print options">
-        	<!--这里是在该子菜单中的选项-->
+            <!--这里是在该子菜单中的选项-->
         </option>
     </options>
 </target>
