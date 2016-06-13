@@ -193,7 +193,7 @@ class target:
         except IndexError:
             raise MissingTag(self.path, "options")
         for o in get_child_tags_by_name(options_node, "option"):
-            self.options.append(get_option(o))
+            self.options.append(get_option(o, self.path))
 
         target.target_dict[os.path.abspath(self.path)] = target
 

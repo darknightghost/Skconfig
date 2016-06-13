@@ -16,10 +16,12 @@
 '''
 
 import xml.dom.minidom
+from analyser.target_exceptions import *
 
 class options:
-    def __init__(self, node):
+    def __init__(self, node, path):
         self.root = node
+        self.path = path
         self.__load()
 
     def close(self):
@@ -41,18 +43,39 @@ class options:
         pass
 
 class opt_checkbox(options):
-    def close(self):
-        self.__restore()
-
     def __load(self):
         #name
+        try:
+            self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "name")
+
         #value
+        try:
+            self.value = self.root.getAttribute("value").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "value")
+
         #enable
-        #taget
-        pass
+        try:
+            self.enable = (self.root.getAttribute("enable").encode('utf-8').decode().lower() == "true")
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "enable")
+
+        #target
+        try:
+            target_str = self.root.getAttribute("target").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "target")
+        self.targets = []
+        for k in target_str.split("|"):
+            self.targets.append(k.split())
+        
+        return
 
     def __restore(self):
-        pass
+        self.root.setAttribute("enable", str(self.enable).lower())
+        return
 
     def open_menu(self):
         pass
@@ -64,20 +87,39 @@ class opt_checkbox(options):
         pass
 
 class opt_list(options):
-    def close(self):
-        self.__restore()
-
     def __load(self):
         #name
+        try:
+            self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "name")
+
         #index
+        try:
+            self.selected = int(self.root.getAttribute("selected").encode('utf-8').decode())
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "selected")
+
         #target
+        try:
+            target_str = self.root.getAttribute("target").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "target")
+        self.targets = []
+        for k in target_str.split("|"):
+            self.targets.append(k.split())
+
         #item
-            #name
-            #value
-        pass
+        #[name, value]
+        self.items = []
+        for item in self.root.getElementsByTagName("item"):
+            self.name.append([item.getAttribute("name").encode('utf-8').decode(),
+                item.getAttribute("value").encode('utf-8').decode()])
+        return
 
     def __restore(self):
-        pass
+        self.root.setAttribute("selected", str(self.selected))
+        return
 
     def open_menu(self):
         pass
@@ -89,18 +131,39 @@ class opt_list(options):
         pass
 
 class opt_input(options):
-    def close(self):
-        self.__restore()
-
     def __load(self):
         #name
+        try:
+            self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "name")
+
         #macro
+        try:
+            self.macro = self.root.getAttribute("macro").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "macro")
+
         #value
+        try:
+            self.value = self.root.getAttribute("value").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "value")
+
         #target
-        pass
+        try:
+            target_str = self.root.getAttribute("target").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "target")
+        self.targets = []
+        for k in target_str.split("|"):
+            self.targets.append(k.split())
+
+        return
 
     def __restore(self):
-        pass
+        self.root.setAttribute("value", self.value)
+        return
 
     def open_menu(self):
         pass
@@ -112,16 +175,23 @@ class opt_input(options):
         pass
 
 class opt_menu(options):
-    def close(self):
-        self.__restore()
-
     def __load(self):
         #name
-        #options
-        pass
+        try:
+            self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        except IndexError:
+            raise MissingAttribute(self.path, "option", "name")
 
-    def __restore(self):
-        pass
+        #options
+        self.options = []
+        for opt_node in self.root.getElementsByTagName("option"):
+            self.options.append(get_option(opt_node, self.path))
+        return
+
+    def close(self):
+        for opt in self.options:
+            opt.close()
+        return
 
     def open_menu(self):
         pass
@@ -136,6 +206,6 @@ OPTION_DICT = {"checkbox" : opt_checkbox,
     "list" : opt_list,
     "input" : opt_input,
     "menu" : opt_menu}
-def get_option(node):
+def get_option(node, path):
     global OPTION_DICT
-    return OPTION_DICT[node.getAttribute("type")](node)
+    return OPTION_DICT[node.getAttribute("type")](node, path)
