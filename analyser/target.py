@@ -73,8 +73,20 @@ class target:
         return ret
 
     def close(self):
+        #Architectures
+        for t in self.base_archs:
+            t.close()
+        
+        #Sub targets
+        for t in self.sub_targets:
+            t.close()
+        
+        #Options
+        for t in self.options:
+            t.close()
+        
         target.target_dict.pop(self.id)
-        self.restore()
+        self.__restore()
         try:
             self.file.seek(0,0)
             self.file.truncate(0)
@@ -172,7 +184,8 @@ class target:
             raise MissingTag(self.path, "sub-targets")
         for subtarget in get_child_tags_by_name(subtarget_node, "target"):
             self.sub_targets.append([subtarget,
-                target(subtarget.getAttribute("path"), actived_arch), subtarget.getAttribute("enable")])
+                target(subtarget.getAttribute("path"), actived_arch),
+                subtarget.getAttribute("enable").encode('utf-8').decode().lower() == "true"])
 
         #Options
         self.options = []
@@ -188,7 +201,10 @@ class target:
         return
 
     def __restore(self):
-        pass
+        #Sub targets
+        for t in self.sub_targets:
+            t[0].setAttribute("enable", str(t[[2]).lower())
+        return
 
     def open_menu(self)
         pass
