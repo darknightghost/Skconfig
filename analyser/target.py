@@ -62,6 +62,14 @@ class target:
         for d in self.dependencies:
             ret = ret + "\n%12s = \"%s\""%("path", d)
 
+        ret = ret + "\n%12s:"%("Options")
+        for o in self.options:
+            ret = ret + "\n\t" + str(o)
+        
+        ret = ret + "\n%12s:"%("Sub targets")
+        for t in self.sub_targets:
+            ret = ret + "\n" + str(t)
+
         return ret
         
     def close(self):
@@ -138,11 +146,10 @@ class target:
         
         #Get actived arch
         try:
-            self.arch = self.archs[self.arch_name]
+            self.actived_arch = self.archs[self.arch_name]
         except KeyError:
             if actived_arch == None:
                 raise MissingArch(self.path, self.arch_name)
-            self.arch = actived_arch
         
         #Dependencies
         self.dependencies = []
@@ -157,9 +164,35 @@ class target:
                 raise MissingAttribute(path, "dep", "path")
         
         #Sub targets
+        #[node, target, enabled]
+        self.sub_targets = []
+        try:
+            subtarget_node = get_child_tags_by_name(self.root, "sub-targets")[0]
+        except IndexError:
+            raise MissingTag(self.path, "sub-targets")
+        for subtarget in get_child_tags_by_name(subtarget_node, "target"):
+            self.sub_targets.append([subtarget,
+                target(subtarget.getAttribute("path"), actived_arch), subtarget.getAttribute("enable")])
+
         #Options
+        self.options = []
+        try:
+            options_node = get_child_tags_by_name(self.root, "options")[0]
+        except IndexError:
+            raise MissingTag(self.path, "options")
+        for o in get_child_tags_by_name(options_node, "option"):
+            self.options.append(get_option(o))
 
         target.target_dict[os.path.abspath(self.path)] = target
         
     def restore(self):
+        pass
+    
+    def open_menu(self)
+        pass
+    
+    def close_menu(self)
+        pass
+    
+    def configure(self):
         pass

@@ -14,7 +14,46 @@
 	  You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+import xml.dom.minidom
 
 class options:
-    def __init__(self):
+    def __init__(self, node):
+        self.root = node
+        
+    def close(self):
         pass
+    
+    def load(self):
+        pass
+    
+    def restore(self):
+        pass
+    
+    def open_menu(self)
+        pass
+    
+    def close_menu(self)
+        pass
+    
+    def configure(self):
+        pass
+
+class opt_checkbox(options):
+    pass
+
+class opt_list(options):
+    pass
+
+class opt_input(options):
+    pass
+
+class opt_menu(options):
+    pass
+
+OPTION_DICT = {"checkbox" : opt_checkbox,
+    "list" : opt_list,
+    "input" : opt_input,
+    "menu" : opt_menu}
+def get_option(node):
+    global OPTION_DICT
+    return OPTION_DICT[node.getAttribute("type")](node)

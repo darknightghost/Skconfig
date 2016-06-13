@@ -94,12 +94,15 @@ class arch:
                 self.build_dict[k][0].appendChild(dom.createTextNode(self.build_dict[k][1]))
             else:
                 self.build_dict[k][0].childNodes[0].nodeValue = self.build_dict[k][1]
-                
-    def compile(self):
+    
+    def open_menu(self)
+        pass
+    
+    def close_menu(self)
+        pass
+
+    def configure(self):
         ret = {}
         for k in self.build_dict.keys():
             ret[k] = self.build_dict[k][1]
         return ret
-    
-    def menu(self):
-        pass

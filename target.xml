@@ -45,14 +45,14 @@
         <!--其他的架构在这里-->
     </archs>
     <dependencies>
-        <!--依赖的target的列表,填当前target目录的相对路径-->
+        <!--依赖的target的列表,填当前target目录的-->
         <dep path="1" />
         <dep path="2" />
         <dep path="3" />
     </dependencies>
     <sub-targets>
         <!--子target列表-->
-        <target enable="true" path="" />
+        <!--<target enable="true" path="" />-->
     </sub-targets>
     <options>
         <!--单选框-->
