@@ -32,7 +32,7 @@ class ControlTypeError(Exception):
     def __str__(self):
         return "Unknow type of control: %s.%s"%(self.ctrl_type,self.msg)
 
-class submenu(control.control):
+class submenu(control):
     def __init__(self,frame,wnd,data):
         e = encoder()
         self.wnd = wnd

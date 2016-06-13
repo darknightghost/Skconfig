@@ -16,10 +16,10 @@
 '''
 
 import curses
-import control
-from ui.controls.ui.ui import *
+from ui.controls.control import *
+from ui.ui import *
 
-class lable(control.control):
+class lable(control):
     def __init__(self,frame,wnd,data):
         e = encoder()
         self.wnd = wnd

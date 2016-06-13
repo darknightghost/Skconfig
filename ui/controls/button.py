@@ -16,10 +16,10 @@
 '''
 
 import curses
-import ui.controls.control
+from ui.controls.control import *
 from ui.ui import *
 
-class button(control.control):
+class button(control):
 	def __init__(self,wnd,data):
 		e = encoder()
 		self.wnd = wnd

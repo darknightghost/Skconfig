@@ -16,10 +16,10 @@
 '''
 
 import curses
-import ui.controls.control
+from ui.controls.control import *
 from ui.ui import *
 
-class checkbox(control.control):
+class checkbox(control):
 	def __init__(self,frame,wnd,data):
 		self.wnd = wnd
 		self.data = data

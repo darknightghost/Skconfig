@@ -16,10 +16,10 @@
 '''
 
 import curses
-import ui.controls.control
+from ui.controls.control import *
 from ui.ui import *
 
-class textbox(control.control):
+class textbox(control):
 	def __init__(self,frame,wnd,data):
 		e = encoder()
 		self.wnd = wnd

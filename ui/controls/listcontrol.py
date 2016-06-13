@@ -16,10 +16,10 @@
 '''
 
 import curses
-import control
-from ui.controls.ui.ui import *
+from ui.controls.control import *
+from ui.ui import *
 
-class listcontrol(control.control):
+class listcontrol(control):
 	def __init__(self,frame,wnd,data):
 		self.wnd = wnd
 		self.data = data
