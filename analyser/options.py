@@ -19,36 +19,116 @@ import xml.dom.minidom
 class options:
     def __init__(self, node):
         self.root = node
-        
+        self.__load()
+
     def close(self):
+        self.__restore()
+
+    def __load(self):
         pass
-    
-    def load(self):
+
+    def __restore(self):
         pass
-    
-    def restore(self):
-        pass
-    
+
     def open_menu(self)
         pass
-    
+
     def close_menu(self)
         pass
-    
+
     def configure(self):
         pass
 
 class opt_checkbox(options):
-    pass
+    def close(self):
+        self.__restore()
+
+    def __load(self):
+        #name
+        #value
+        #enable
+        #taget
+        pass
+
+    def __restore(self):
+        pass
+
+    def open_menu(self)
+        pass
+
+    def close_menu(self)
+        pass
+
+    def configure(self):
+        pass
 
 class opt_list(options):
-    pass
+    def close(self):
+        self.__restore()
+
+    def __load(self):
+        #name
+        #index
+        #target
+        #item
+            #name
+            #value
+        pass
+
+    def __restore(self):
+        pass
+
+    def open_menu(self)
+        pass
+
+    def close_menu(self)
+        pass
+
+    def configure(self):
+        pass
 
 class opt_input(options):
-    pass
+    def close(self):
+        self.__restore()
+
+    def __load(self):
+        #name
+        #macro
+        #value
+        #target
+
+    def __restore(self):
+        pass
+
+    def open_menu(self)
+        pass
+
+    def close_menu(self)
+        pass
+
+    def configure(self):
+        pass
 
 class opt_menu(options):
-    pass
+    def close(self):
+        self.__restore()
+
+    def __load(self):
+        #name
+        #options
+        pass
+
+    def __restore(self):
+        pass
+
+    def open_menu(self)
+        pass
+
+    def close_menu(self)
+        pass
+
+    def configure(self):
+        pass
 
 OPTION_DICT = {"checkbox" : opt_checkbox,
     "list" : opt_list,

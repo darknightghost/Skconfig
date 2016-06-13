@@ -63,7 +63,7 @@
             <item name="uboot" value="-DUBOOT" />
         </option>
         <!--单行文本框-->
-        <option type="input" name="Comment" marco="-DCOMMENT" value="" />
+        <option type="input" name="Comment" marco="-DCOMMENT" value="" target="CFLAGS|ASFLAGS|LDFLAGS" />
         <!--菜单-->
         <option type="menu" name="Early print options">
             <!--这里是在该子菜单中的选项-->

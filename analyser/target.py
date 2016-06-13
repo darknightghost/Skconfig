@@ -38,14 +38,14 @@ class target:
         self.file = open(path, "r+")
         self.dom = xml.dom.minidom.parse(self.file)
         self.root = self.dom.documentElement
-        self.load(actived_arch)
-        
+        self.__load(actived_arch)
+
     def __del__(self):
         try:
             self.file.close()
         except Exception:
             pass
-    
+
     def __str__(self):
         ret = "Target info:"
         ret = ret + "\n%12s: %s"%("path", self.path)
@@ -57,7 +57,7 @@ class target:
         ret = ret + "\n%12s:"%("Architectures")
         for i in self.base_archs:
             ret = ret + "\n" + str(i)
-        
+
         ret = ret + "\n%12s:"%("Dependencies")
         for d in self.dependencies:
             ret = ret + "\n%12s = \"%s\""%("path", d)
@@ -65,13 +65,13 @@ class target:
         ret = ret + "\n%12s:"%("Options")
         for o in self.options:
             ret = ret + "\n\t" + str(o)
-        
+
         ret = ret + "\n%12s:"%("Sub targets")
         for t in self.sub_targets:
             ret = ret + "\n" + str(t)
 
         return ret
-        
+
     def close(self):
         target.target_dict.pop(self.id)
         self.restore()
@@ -85,8 +85,8 @@ class target:
         self.file = None
         self.dom = None
         return
-    
-    def load(self, actived_arch):
+
+    def __load(self, actived_arch):
         #Output file name
         try:
             self.output_node = get_child_tags_by_name(self.root, "output")[0]
@@ -95,7 +95,7 @@ class target:
         self.output = self.output_node.getAttribute("name").encode('utf-8').decode()
         if self.output == "":
             raise MissingAttribute(self.path, "output", "name")
-        
+
         #Output dir
         try:
             self.outdir_node = get_child_tags_by_name(self.root, "outdir")[0]
@@ -104,7 +104,7 @@ class target:
         self.outdir = self.outdir_node.getAttribute("path").encode('utf-8').decode()
         if self.output == "":
             raise MissingAttribute(self.path, "outdir", "path")
-        
+
         #Middie dir
         try:
             self.middir_node = get_child_tags_by_name(self.root, "middir")[0]
@@ -113,7 +113,7 @@ class target:
         self.middir = self.middir_node.getAttribute("path").encode('utf-8').decode()
         if self.middir == "":
             raise MissingAttribute(self.path, "middir", "path")
-        
+
         #Introduction
         try:
             self.introduction_node = get_child_tags_by_name(self.root, "introduction")[0]
@@ -123,7 +123,7 @@ class target:
             self.introduction = self.introduction_node.childNodes[0].nodeValue.encode('utf-8').decode()
         except IndexError:
             self.introduction = ""
-        
+
         #Architectures
         self.archs = {}
         self.base_archs = []
@@ -136,21 +136,21 @@ class target:
         except IndexError:
             if actived_arch == None:
                 raise MissingTag(self.path, "archs")
-            
+
         else:
             #Scan arch list
             for node in get_child_tags_by_name(self.archs_node, "arch"):
                 current_arch = arch(node, self.dom, self.path)
                 current_arch.regist(self.archs)
                 self.base_archs.append(current_arch)
-        
+
         #Get actived arch
         try:
             self.actived_arch = self.archs[self.arch_name]
         except KeyError:
             if actived_arch == None:
                 raise MissingArch(self.path, self.arch_name)
-        
+
         #Dependencies
         self.dependencies = []
         try:
@@ -162,7 +162,7 @@ class target:
                 self.dependencies.append(os.path.abspath(dep_node.getAttribute("path").encode('utf-8').decode()))
             except IndexError:
                 raise MissingAttribute(path, "dep", "path")
-        
+
         #Sub targets
         #[node, target, enabled]
         self.sub_targets = []
@@ -184,15 +184,17 @@ class target:
             self.options.append(get_option(o))
 
         target.target_dict[os.path.abspath(self.path)] = target
-        
-    def restore(self):
+
+        return
+
+    def __restore(self):
         pass
-    
+
     def open_menu(self)
         pass
-    
+
     def close_menu(self)
         pass
-    
+
     def configure(self):
         pass

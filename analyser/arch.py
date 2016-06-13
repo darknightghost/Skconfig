@@ -34,9 +34,8 @@ class arch:
         self.path = path
         self.root = node
         self.dom = dom
-        self.load(parent)
-        
-    
+        self.__load(parent)
+
     def __str__(self):
         ret = "Architecture \"%s\":"%(self.name)
         ret = ret + "\n%12s: %s"%("name", self.name)
@@ -44,14 +43,14 @@ class arch:
             ret = ret + "\n%12s: %s"%(k, self.build_dict[k][1])
         ret = ret + "\n"
         return ret
-    
+
     def close(self):
         self.restore()
 
     def regist(self, dict):
         dict[self.name] = self
-    
-    def load(self, parent):
+
+    def __load(self, parent):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()
@@ -85,8 +84,8 @@ class arch:
                 self.build_dict[k].append("")
                 
         return
-    
-    def restore(self):
+
+    def __restore(self):
         #Makeflie variables
         #[node, value]
         for k in self.build_dict.keys():
@@ -94,10 +93,10 @@ class arch:
                 self.build_dict[k][0].appendChild(dom.createTextNode(self.build_dict[k][1]))
             else:
                 self.build_dict[k][0].childNodes[0].nodeValue = self.build_dict[k][1]
-    
+
     def open_menu(self)
         pass
-    
+
     def close_menu(self)
         pass
 
