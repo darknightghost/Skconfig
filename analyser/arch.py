@@ -22,10 +22,18 @@ import xml.dom.minidom
 from analyser.target_exceptions import *
 from analyser.target import *
 
+def get_child_tags_by_name(parent, name):
+    ret = []
+    for node in parent.getElementsByTagName(name):
+        if node.parentNode == parent:
+            ret.append(node)
+    return ret
+
 class arch:
-    def __init__(self, node, path, parent = None):
+    def __init__(self, node, dom, path, parent = None):
         self.path = path
         self.root = node
+        self.dom = dom
         self.load(parent)
         
     
@@ -38,21 +46,17 @@ class arch:
         return ret
     
     def close(self):
-        pass
+        self.restore()
 
     def regist(self, dict):
         dict[self.name] = self
     
     def load(self, parent):
         #name
-        basename = self.root.getAttribute("name").encode('utf-8').decode()
-        if basename == "":
+        try:
+            self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        except TypeErrot:
             raise MissingAttribute(self.path, "arch", "name")
-        if parent != None:
-            self.name = parent.name
-            self.name = self.name + "." + basename
-        else:
-            self.name = basename
         
         #Makeflie variables
         #[node, value]
@@ -72,7 +76,7 @@ class arch:
         
         for k in self.build_dict.keys():
             try:
-                self.build_dict[k] = [self.root.getElementsByTagName(k)[0]]
+                self.build_dict[k] = [get_child_tags_by_name(self.root, k)[0]]
             except IndexError:
                 raise ArchMissingTag(self.path, k, self.name)
             try:
@@ -80,9 +84,22 @@ class arch:
             except IndexError:
                 self.build_dict[k].append("")
                 
-        #Sub architectures
-        
-
+        return
     
     def restore(self):
+        #Makeflie variables
+        #[node, value]
+        for k in self.build_dict.keys():
+            if len(self.build_dict[k][0].childNodes) == 0:
+                self.build_dict[k][0].appendChild(dom.createTextNode(self.build_dict[k][1]))
+            else:
+                self.build_dict[k][0].childNodes[0].nodeValue = self.build_dict[k][1]
+                
+    def compile(self):
+        ret = {}
+        for k in self.build_dict.keys():
+            ret[k] = self.build_dict[k][1]
+        return ret
+    
+    def menu(self):
         pass

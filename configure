@@ -18,9 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from analyser import target
+from analyser import *
 
-root_target = target.target("target.xml")
+root_target = target("target.xml")
 
 
 print(root_target)

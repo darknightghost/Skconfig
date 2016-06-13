@@ -19,31 +19,49 @@
 '''
 
 import xml.dom.minidom
+import os
 from analyser.target_exceptions import *
 from analyser.arch import *
 from analyser.options import *
 
+def get_child_tags_by_name(parent, name):
+    ret = []
+    for node in parent.getElementsByTagName(name):
+        if node.parentNode == parent:
+            ret.append(node)
+    return ret
+
 class target:
     target_dict = {}
     def __init__(self,path, actived_arch = None):
-        self.path = path
+        self.path = os.path.abspath(path)
         self.file = open(path, "r+")
         self.dom = xml.dom.minidom.parse(self.file)
         self.root = self.dom.documentElement
         self.load(actived_arch)
         
     def __del__(self):
-        self.file.close()
+        try:
+            self.file.close()
+        except Exception:
+            pass
     
     def __str__(self):
         ret = "Target info:"
-        ret = ret + "\n%12s: %s"%("id", self.id)
+        ret = ret + "\n%12s: %s"%("path", self.path)
         ret = ret + "\n%12s: %s"%("output", self.output)
         ret = ret + "\n%12s: %s"%("outdir", self.outdir)
         ret = ret + "\n%12s: %s"%("middir", self.middir)
+        ret = ret + "\n%12s: %s"%("Introduction", self.introduction)
         ret = ret + "\n%12s: %s"%("Actived arch", self.arch_name)
-        for k in self.archs:
-            ret = ret + "\n" + str(self.archs[k])
+        ret = ret + "\n%12s:"%("Architectures")
+        for i in self.base_archs:
+            ret = ret + "\n" + str(i)
+        
+        ret = ret + "\n%12s:"%("Dependencies")
+        for d in self.dependencies:
+            ret = ret + "\n%12s = \"%s\""%("path", d)
+
         return ret
         
     def close(self):
@@ -61,18 +79,9 @@ class target:
         return
     
     def load(self, actived_arch):
-        #id
-        try:
-            self.id_node = self.root.getElementsByTagName("id")[0]
-        except IndexError:
-            raise MissingTag(self.path, "id")
-        self.id = self.id_node.getAttribute("value").encode('utf-8').decode()
-        if self.id == "":
-            raise MissingAttribute(self.path, "id", "value")
-        
         #Output file name
         try:
-            self.output_node = self.root.getElementsByTagName("output")[0]
+            self.output_node = get_child_tags_by_name(self.root, "output")[0]
         except IndexError:
             raise MissingTag(self.path, "output")
         self.output = self.output_node.getAttribute("name").encode('utf-8').decode()
@@ -81,7 +90,7 @@ class target:
         
         #Output dir
         try:
-            self.outdir_node = self.root.getElementsByTagName("outdir")[0]
+            self.outdir_node = get_child_tags_by_name(self.root, "outdir")[0]
         except IndexError:
             raise MissingTag(self.path, "outdir")
         self.outdir = self.outdir_node.getAttribute("path").encode('utf-8').decode()
@@ -90,18 +99,28 @@ class target:
         
         #Middie dir
         try:
-            self.middir_node = self.root.getElementsByTagName("middir")[0]
+            self.middir_node = get_child_tags_by_name(self.root, "middir")[0]
         except IndexError:
             raise MissingTag(self.path, "middir")
         self.middir = self.middir_node.getAttribute("path").encode('utf-8').decode()
         if self.middir == "":
             raise MissingAttribute(self.path, "middir", "path")
         
+        #Introduction
+        try:
+            self.introduction_node = get_child_tags_by_name(self.root, "introduction")[0]
+        except IndexError:
+            raise MissingTag(self.path, "introduction")
+        try:
+            self.introduction = self.introduction_node.childNodes[0].nodeValue.encode('utf-8').decode()
+        except IndexError:
+            self.introduction = ""
+        
         #Architectures
         self.archs = {}
         self.base_archs = []
         try:
-            self.archs_node = self.root.getElementsByTagName("archs")[0]
+            self.archs_node = get_child_tags_by_name(self.root, "archs")[0]
             if actived_arch == None:
                 self.arch_name = self.archs_node.getAttribute("actived").encode('utf-8').decode()
                 if self.arch_name == "":
@@ -112,8 +131,8 @@ class target:
             
         else:
             #Scan arch list
-            for node in self.archs_node.getElementsByTagName("arch"):
-                current_arch = arch(node, self.path)
+            for node in get_child_tags_by_name(self.archs_node, "arch"):
+                current_arch = arch(node, self.dom, self.path)
                 current_arch.regist(self.archs)
                 self.base_archs.append(current_arch)
         
@@ -126,10 +145,21 @@ class target:
             self.arch = actived_arch
         
         #Dependencies
+        self.dependencies = []
+        try:
+            dep_node = get_child_tags_by_name(self.root, "dependencies")[0]
+        except IndexError:
+            raise MissingTag(self.path, "dependencies")
+        for dep in get_child_tags_by_name(dep_node, "dep"):
+            try:
+                self.dependencies.append(os.path.abspath(dep_node.getAttribute("path").encode('utf-8').decode()))
+            except IndexError:
+                raise MissingAttribute(path, "dep", "path")
+        
         #Sub targets
         #Options
 
-        target.target_dict[self.id] = target
+        target.target_dict[os.path.abspath(self.path)] = target
         
     def restore(self):
         pass
