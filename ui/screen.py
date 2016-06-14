@@ -28,7 +28,7 @@ class screen:
         from ui.ui import *
 
         scr = screen.screen()
-        scr.screen_main(menu)
+        scr.screen_main(menu, title)
         
     The menu is a list in the format of
     [[type,text,value],
@@ -38,12 +38,12 @@ class screen:
         [type,text,value]]
         
     Current support types:
-    Type			Value										Description
-    "lable"			None										Static text
-    "submenu"		menu										Sub Menu Entery
-    "checkbox"		True or False								CheckBox
-    "textbox"		string										TextBox
-    "listcontrol"	[[text1,text2,text3...],selected-index]		Show a list and select one
+    Type            Value                                       Description
+    "lable"         None                                        Static text
+    "submenu"       menu                                        Sub Menu Entery
+    "checkbox"      True or False                               CheckBox
+    "textbox"       string                                      TextBox
+    "listcontrol"   [[text1,text2,text3...],selected-index]     Show a list and select one
     '''
     def __init__(self):
         locale.setlocale(locale.LC_ALL, '')

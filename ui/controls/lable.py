@@ -26,11 +26,22 @@ class lable(control):
         self.text = e.convert(data[1])
         c = color_t()
         self.color = c.get_color(color_t.BLACK,color_t.WHITE) | curses.A_BOLD
+        self.width = self.wnd.getmaxyx()[1] - 2
+        self.text_width = self.width
+        
+        #Split text
+        self.lines = []
+        for l in self.text.split("\n"):
+            while len(l) > 0:
+                self.lines.append(l[ : self.text_width])
+                l = l[self.text_width : ]
 
     def draw(self,pos,begin,max):
         self.pos = pos
-        self.wnd.addstr(self.pos.top, self.pos.left,self.text,self.color)
-        return 1
+        
+        for i in range(0, len(self.lines)):
+            self.wnd.addstr(self.pos.top + i, self.pos.left, self.lines[i], self.color)
+        return len(self.lines)
 
     def get_size(self):
-        return rect_t(len(self.text) + 2,1)
+        return rect_t(self.width, len(self.lines))

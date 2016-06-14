@@ -37,6 +37,10 @@ class target:
         self.file = open(path, "r+")
         self.dom = xml.dom.minidom.parse(self.file)
         self.root = self.dom.documentElement
+        if actived_arch == None:
+            self.is_root = True
+        else:
+            self.is_root = False
         self.__load(actived_arch)
 
     def __del__(self):
@@ -47,6 +51,7 @@ class target:
 
     def __str__(self):
         ret = "Target info:"
+        ret = ret + "\n%12s: %s"%("name", self.name)
         ret = ret + "\n%12s: %s"%("path", self.path)
         ret = ret + "\n%12s: %s"%("output", self.output)
         ret = ret + "\n%12s: %s"%("outdir", self.outdir)
@@ -84,7 +89,7 @@ class target:
         for t in self.options:
             t.close()
         
-        target.target_dict.pop(self.id)
+        target.target_dict.pop(self.path)
         self.__restore()
         try:
             self.file.seek(0,0)
@@ -98,6 +103,9 @@ class target:
         return
 
     def __load(self, actived_arch):
+        #Name
+        self.name = self.root.getAttribute("name").encode('utf-8').decode()
+        
         #Output file name
         try:
             self.output_node = get_child_tags_by_name(self.root, "output")[0]
@@ -170,12 +178,12 @@ class target:
             raise MissingTag(self.path, "dependencies")
         for dep in get_child_tags_by_name(dep_node, "dep"):
             try:
-                self.dependencies.append(os.path.abspath(dep_node.getAttribute("path").encode('utf-8').decode()))
+                self.dependencies.append(os.path.abspath(os.path.abspath(dep_node.getAttribute("path").encode('utf-8').decode())))
             except IndexError:
                 raise MissingAttribute(path, "dep", "path")
 
         #Sub targets
-        #[node, target, enabled]
+        #[node, target, enabled, checkbox]
         self.sub_targets = []
         try:
             subtarget_node = get_child_tags_by_name(self.root, "sub-targets")[0]
@@ -184,7 +192,7 @@ class target:
         for subtarget in get_child_tags_by_name(subtarget_node, "target"):
             self.sub_targets.append([subtarget,
                 target(subtarget.getAttribute("path"), actived_arch),
-                subtarget.getAttribute("enable").encode('utf-8').decode().lower() == "true"])
+                subtarget.getAttribute("enable").encode('utf-8').decode().lower() == "true", None])
 
         #Options
         self.options = []
@@ -195,21 +203,90 @@ class target:
         for o in get_child_tags_by_name(options_node, "option"):
             self.options.append(get_option(o, self.path))
 
-        target.target_dict[os.path.abspath(self.path)] = target
+        target.target_dict[self.path] = target
 
         return
 
     def __restore(self):
+        #Actived arch
+        if self.is_root:
+            self.archs_node.setAttribute("actived", self.arch_name)
+        
         #Sub targets
         for t in self.sub_targets:
             t[0].setAttribute("enable", str(t[2]).lower())
         return
 
     def open_menu(self):
-        pass
+        #Intruduction
+        self.menu = [["label", self.introduction, None]]
+        
+        #Dependencies
+        dep_str = "Required targets:"
+        for d in self.dependencies:
+            dep_str = "\n    " + target.target_dict[d].name
+        self.menu.append(["label", dep_str, None])
+
+        #Actived arch
+        if self.is_root:
+            arch_list = []
+            i = 0
+            selected = 0
+            for a in self.base_archs:
+                arch_list.append(a.name)
+                if a.name == self.arch_name:
+                    selected = i
+                i = i + 1
+            self.active_arch_menu = ["listcontrol", "Actived architecture", [arch_list, selected]]
+            self.menu.append(self.active_arch_menu)
+        
+        #Architecuture settings
+        arch_setting_menu = []
+        for a in self.base_archs:
+            arch_setting_menu.append(a.open_menu())
+        self.menu.append(["submenu", "Architecture settings" , arch_setting_menu])
+
+        #Build options
+        option_menu = []
+        for opt in self.options:
+            option_menu.append(opt.open_menu())
+        self.menu.append(["submenu", "Build options" , option_menu])
+        
+        #Sub targets
+        sub_targets_menu = []
+        for t in sub_targets:
+            sub_targets_menu.append(["label", t[1].name, None])
+            c = ["checkbox", "Build this target", t[2]]
+            sub_targets_menu.append(c)
+            t[3] = c
+            sub_targets_menu.append(["submenu", "Target options", t[1].open_menu()])
+        self.menu.append(["submenu", "Sub targets" , sub_targets_menu])
+                         
+        return self.menu
 
     def close_menu(self):
-        pass
+        #Actived arch
+        if self.is_root:
+            self.arch_name = self.base_archs[self.active_arch_menu[2][1]].name
+            self.active_arch_menu = None
+        
+        #Architecuture settings
+        for a in self.base_archs:
+            a.close_menu()
+        
+        #Options
+        for opt in self.options:
+            opt.close_menu()
+            
+        #sub targets
+        for t in sub_targets:
+            t[2] = t[3][2]
+            t[3] = None
+            t[1].close_menu()
+        
+        self.menu = None
+            
+        return
 
     def configure(self):
         pass

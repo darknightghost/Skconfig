@@ -78,10 +78,13 @@ class opt_checkbox(options):
         return
 
     def open_menu(self):
-        pass
+        self.menu = ["checkbox", self.name, self.enable]
+        return self.menu
 
     def close_menu(self):
-        pass
+        self.enable = self.menu[2]
+        self.menu = None
+        return
 
     def configure(self):
         pass
@@ -94,7 +97,7 @@ class opt_list(options):
         except IndexError:
             raise MissingAttribute(self.path, "option", "name")
 
-        #index
+        #Selected index
         try:
             self.selected = int(self.root.getAttribute("selected").encode('utf-8').decode())
         except IndexError:
@@ -122,10 +125,12 @@ class opt_list(options):
         return
 
     def open_menu(self):
-        pass
+        self.menu = ["listcontrol", self.name, [self.items, self.selected]]
+        return self.menu
 
     def close_menu(self):
-        pass
+        self.selected = self.menu[2][1]
+        self.menu = None
 
     def configure(self):
         pass
@@ -166,10 +171,12 @@ class opt_input(options):
         return
 
     def open_menu(self):
-        pass
+        self.menu = ["textbox", self.name, self.value]
+        return self.menu
 
     def close_menu(self):
-        pass
+        self.value = self.menu[2]
+        self.menu = None
 
     def configure(self):
         pass
@@ -194,10 +201,17 @@ class opt_menu(options):
         return
 
     def open_menu(self):
-        pass
+        submenu = []
+        for opt in self.options:
+            submenu.append(opt.open_menu())
+        self.menu = ["submenu", self.name, submenu]
+        return self.menu
 
     def close_menu(self):
-        pass
+        for opt in self.options:
+            opt.close_menu()
+        self.menu = None
+        return
 
     def configure(self):
         pass

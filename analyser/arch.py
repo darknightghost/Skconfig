@@ -27,6 +27,8 @@ def get_child_tags_by_name(parent, name):
     return ret
 
 class arch:
+    tag_list = ["PREV", "DEP", "DEP_COMMAND", "CC", "CFLAGS", "C_COMMAND", "AS", "ASFLAGS",
+        "AS_COMMAND", "LD", "LDFLAGS", "LD_COMMAND", "AFTER"]
     def __init__(self, node, dom, path, parent = None):
         self.path = path
         self.root = node
@@ -56,21 +58,8 @@ class arch:
         
         #Makeflie variables
         #[node, value]
-        self.build_dict = {"PREV" : None,
-            "DEP" : None,
-            "DEP_COMMAND" : None,
-            "CC" : None,
-            "CFLAGS" : None,
-            "C_COMMAND" : None,
-            "AS" : None,
-            "ASFLAGS" : None,
-            "AS_COMMAND" : None,
-            "LD" : None,
-            "LDFLAGS" : None,
-            "LD_COMMAND" : None,
-            "AFTER" : None}
-        
-        for k in self.build_dict.keys():
+        self.build_dict = {}
+        for k in arch.tag_list:
             try:
                 self.build_dict[k] = [get_child_tags_by_name(self.root, k)[0]]
             except IndexError:
@@ -85,17 +74,23 @@ class arch:
     def __restore(self):
         #Makeflie variables
         #[node, value]
-        for k in self.build_dict.keys():
+        for k in arch.tag_list:
             if len(self.build_dict[k][0].childNodes) == 0:
                 self.build_dict[k][0].appendChild(dom.createTextNode(self.build_dict[k][1]))
             else:
                 self.build_dict[k][0].childNodes[0].nodeValue = self.build_dict[k][1]
 
     def open_menu(self):
-        pass
+        self.menu = []
+        for k in arch.tag_list:
+            self.menu.append(["textbox", k, self.build_dict[k][1]])
+        return ["submenu", "self.name" , self.menu]
 
     def close_menu(self):
-        pass
+        for c in self.menu:
+            self.build_dict[c[1]][1] = c[2]
+        self.menu = None
+        return
 
     def configure(self):
         ret = {}
