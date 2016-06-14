@@ -17,5 +17,14 @@
 
 from ui import *
 from ui.menu import *
+from ui.screen import *
+from analyser import *
+
+root_target = target("target.xml")
+menu = root_target.open_menu()
+scr = screen()
+scr.screen_main(menu, root_target.name)
+root_target.close_menu()
+root_target.close()
 
 
