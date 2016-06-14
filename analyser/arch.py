@@ -27,8 +27,8 @@ def get_child_tags_by_name(parent, name):
     return ret
 
 class arch:
-    tag_list = ["PREV", "DEP", "DEP_COMMAND", "CC", "CFLAGS", "C_COMMAND", "AS", "ASFLAGS",
-        "AS_COMMAND", "LD", "LDFLAGS", "LD_COMMAND", "AFTER"]
+    tag_list = ["PREV", "DEP", "DEPRULE", "CC", "CFLAGS", "CCRULE", "AS", "ASFLAGS",
+        "ASRULE", "LD", "LDFLAGS", "LDRULE", "AFTER"]
     def __init__(self, node, dom, path, parent = None):
         self.path = path
         self.root = node
@@ -84,7 +84,7 @@ class arch:
         self.menu = []
         for k in arch.tag_list:
             self.menu.append(["textbox", k, self.build_dict[k][1]])
-        return ["submenu", "self.name" , self.menu]
+        return ["submenu", self.name , self.menu]
 
     def close_menu(self):
         for c in self.menu:

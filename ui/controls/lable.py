@@ -21,9 +21,8 @@ from ui.ui import *
 
 class lable(control):
     def __init__(self,frame,wnd,data):
-        e = encoder()
         self.wnd = wnd
-        self.text = e.convert(data[1])
+        self.text = data[1]
         c = color_t()
         self.color = c.get_color(color_t.BLACK,color_t.WHITE) | curses.A_BOLD
         self.width = self.wnd.getmaxyx()[1] - 2
@@ -33,14 +32,14 @@ class lable(control):
         self.lines = []
         for l in self.text.split("\n"):
             while len(l) > 0:
-                self.lines.append(l[ : self.text_width])
+                self.lines.append(l[ : self.text_width].strip())
                 l = l[self.text_width : ]
 
     def draw(self,pos,begin,max):
         self.pos = pos
         
         for i in range(0, len(self.lines)):
-            self.wnd.addstr(self.pos.top + i, self.pos.left, self.lines[i], self.color)
+            self.wnd.addstr(int(self.pos.top + i), int(self.pos.left), self.lines[i], self.color)
         return len(self.lines)
 
     def get_size(self):

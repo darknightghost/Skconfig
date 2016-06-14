@@ -34,9 +34,8 @@ class ControlTypeError(Exception):
 
 class submenu(control):
     def __init__(self,frame,wnd,data):
-        e = encoder()
         self.wnd = wnd
-        self.title = e.convert(data[1])
+        self.title = data[1]
         self.data = data
         self.frame = frame
         c = color_t()
@@ -52,7 +51,6 @@ class submenu(control):
         return 1
         
     def refresh(self):
-        e = encoder()
         if self.focused:
             color = self.color | curses.A_REVERSE
         else:
@@ -82,8 +80,7 @@ class submenu(control):
 
     def on_key_press(self,key):
         if key == ord('\n'):
-            e = encoder()
-            m = menu(self.frame.scr,e.unconvert(self.title))
+            m = menu(self.frame.scr, self.title)
             m.show_menu(self.data[2])
             self.frame.refresh = True
         return
@@ -98,11 +95,10 @@ class menu:
         "listcontrol" : (listcontrol,4,True),
         "textbox" : (textbox,4,True),
         "submenu" : (submenu,4,True)}
-    def __init__(self,scr,title):
-        e = encoder()
+    def __init__(self, scr, title):
         self.scr = scr
         self.back = False
-        self.title = e.convert(title)
+        self.title = title
 
     def show_menu(self,menu):
         #Draw window
@@ -120,8 +116,8 @@ class menu:
         while not self.back:
             #Draw title
             color = color_t()
-            self.wnd.addstr(0,0," " * self.rect.width,color.get_color(0,color_t.WHITE) | curses.A_BOLD)
-            self.wnd.addstr(0, self.rect.width / 2 - len(self.title) / 2,self.title,color.get_color(0,color_t.WHITE) | curses.A_BOLD)
+            self.wnd.addstr(0,0," " * int(self.rect.width), color.get_color(0,color_t.WHITE) | curses.A_BOLD)
+            self.wnd.addstr(0, int(self.rect.width / 2 - len(self.title) / 2), self.title, color.get_color(0,color_t.WHITE) | curses.A_BOLD)
             self.wnd.refresh()
 
             #Clear menu
@@ -130,8 +126,8 @@ class menu:
 
 
             #Draw buttons
-            for left in range(1,self.rect.width - 1):
-                self.wnd.addch(self.rect.height - 2,left,' ')
+            for left in range(1, int(self.rect.width - 1)):
+                self.wnd.addch(int(self.rect.height - 2), int(left), ' ')
 
             self.btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
 
@@ -199,30 +195,29 @@ class menu:
             (parent_rect.width - self.rect.width) / 2)
 
         color = color_t()
-        e = encoder()
 
         #Draw shadow
         shadow_color = color.get_color(color_t.BLACK,color_t.BLUE)
-        for top in range(self.pos.top + 1,
-            self.pos.top + self.rect.height + 1):
-            self.scr.stdscr.addstr(top,self.pos.left + self.rect.width,
-                e.convert('█'),shadow_color)
-        for left in range(self.pos.left + 1,
-            self.pos.left + self.rect.width):
-            self.scr.stdscr.addstr(self.pos.top + self.rect.height,left,
-                e.convert('█'),shadow_color)
+        for top in range(int(self.pos.top + 1),
+            int(self.pos.top + self.rect.height + 1)):
+            self.scr.stdscr.addstr(int(top), int(self.pos.left + self.rect.width),
+                '█',shadow_color)
+        for left in range(int(self.pos.left + 1),
+            int(self.pos.left + self.rect.width)):
+            self.scr.stdscr.addstr(int(self.pos.top + self.rect.height), int(left),
+                '█',shadow_color)
         self.scr.stdscr.refresh()
         
         #Draw window
-        self.wnd = self.scr.stdscr.subwin(self.rect.height,self.rect.width,
-            self.pos.top,self.pos.left)
+        self.wnd = self.scr.stdscr.subwin(int(self.rect.height), int(self.rect.width),
+            int(self.pos.top), int(self.pos.left))
         self.wnd.bkgd(' ',color.get_color(0,color_t.WHITE))
         self.wnd.refresh()
         
         #Draw client region
         self.client_region = region_t(1,1,self.rect.width - 2,self.rect.height - 1 - 3)
-        self.client = self.wnd.derwin(self.client_region.rect.height,self.client_region.rect.width,
-            self.client_region.pos.top,self.client_region.pos.left)
+        self.client = self.wnd.derwin(int(self.client_region.rect.height), int(self.client_region.rect.width),
+            int(self.client_region.pos.top), int(self.client_region.pos.left))
         self.client.box()
         self.client.refresh()
         
@@ -283,8 +278,8 @@ class menu:
                 indent = self.control_dict[menu[ctrl_index][0]][1]
             except KeyError:
                 raise ControlTypeError(menu[ctrl_index][0])
-            except TypeError:
-                raise TypeError(str(menu))
+            #except TypeError:
+                #raise TypeError(str(menu))
                 
             #Get control height
             ctrl_height = ctrl.get_size().height

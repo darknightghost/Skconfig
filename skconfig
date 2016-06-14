@@ -25,6 +25,6 @@ menu = root_target.open_menu()
 scr = screen()
 scr.screen_main(menu, root_target.name)
 root_target.close_menu()
-root_target.close()
+#root_target.close()
 
 

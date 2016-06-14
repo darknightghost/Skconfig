@@ -1,18 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?><target name="test all" type="virtual">
-    <output name="输出文件名" />
-    <outdir path="输出目录" />
-    <middir path="中间文件目录" />
-    <introduction>
-      This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation,
-      aaaaaa
+<?xml version="1.0" encoding="utf-8"?><target name="a" type="build">
+    <output name="a" />
+    <outdir path="../../bin/$(name)" />
+    <middir path="../../obj/$(name)" />
+    <introduction>This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
+        This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
     </introduction>
-    <archs actived="x86">
+    <archs>
         <arch name="x86">
             <PREV>echo prev</PREV>
             <DEP>gcc</DEP>
             <DEPRULE>$(DEP) -MM -o $@ $&lt;;if [ $$? == 0 ];then cat $@|awk 'NR == 1 {printf(&quot;%s%s\n&quot;,&quot;$(OBJDIR)/$(ARCH)/&quot;,$$0)} NR != 1 {print $$0}' &gt; $@; fi</DEPRULE>
             <CC>gcc</CC>
-            <CFLAGS>-c</CFLAGS>
+            <CFLAGS>-c -DTEST=&quot;aaaax86&quot;</CFLAGS>
             <CCRULE>$(CC) $(CFLAGS) -o $@ $&lt;</CCRULE>
             <AS>gcc</AS>
             <ASFLAGS>-c</ASFLAGS>
@@ -27,7 +26,7 @@
             <DEP>arm-none-eabi-gcc</DEP>
             <DEPRULE>$(DEP) -MM -o $@ $&lt;;if [ $$? == 0 ];then cat $@|awk 'NR == 1 {printf(&quot;%s%s\n&quot;,&quot;$(OBJDIR)/$(ARCH)/&quot;,$$0)} NR != 1 {print $$0}' &gt; $@; fi</DEPRULE>
             <CC>arm-none-eabi-gcc</CC>
-            <CFLAGS>-c</CFLAGS>
+            <CFLAGS>-c -DTEST=&quot;aaaaarm&quot;</CFLAGS>
             <CCRULE>$(CC) $(CFLAGS) -o $@ $&lt;</CCRULE>
             <AS>arm-none-eabi-gcc</AS>
             <ASFLAGS>-c</ASFLAGS>
@@ -39,10 +38,9 @@
         </arch>
     </archs>
     <dependencies>
+        <dep path="../b/target.xml" />
     </dependencies>
     <sub-targets>
-        <target enable="true" path="src/a/target.xml" />
-        <target enable="true" path="src/b/target.xml" />
     </sub-targets>
     <options>
     </options>

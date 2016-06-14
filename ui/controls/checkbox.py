@@ -33,16 +33,15 @@ class checkbox(control):
 		return 1
 		
 	def refresh(self):
-		e = encoder()
 		if self.focus:
 			color = self.color | curses.A_REVERSE
 		else:
 			color = self.color
 		if self.data[2] == True:
 			self.wnd.addstr(self.pos.top, self.pos.left,
-				e.convert("[√] %s"%(self.data[1])),color)
+				"[√] %s"%(self.data[1]),color)
 		else:
-			self.wnd.addstr(self.pos.top, self.pos.left,e.convert("[ ] %s"%(self.data[1])),color)
+			self.wnd.addstr(self.pos.top, self.pos.left,"[ ] %s"%(self.data[1]),color)
 		self.wnd.refresh()
 		return
 		

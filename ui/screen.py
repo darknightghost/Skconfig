@@ -16,10 +16,11 @@
 '''
 
 import curses
-import traceback
+import sys
 import locale
+import traceback
 from ui.data import *
-from ui.menu import *
+from ui import menu
 
 class screen:
     '''
@@ -66,27 +67,31 @@ class screen:
             self.stdscr.nodelay(0)
             
             #Draw background
-            self.stdscr.bkgd(' ',color.get_color(0,color_t.BLUE))
+            self.stdscr.bkgd(' ', color.get_color(0,color_t.BLUE))
             curses.curs_set(0)
-            e = encoder()
-            self.stdscr.addstr(0,0,e.convert(title),
-                color.get_color(color_t.WHITE,color_t.BLUE) | curses.A_BOLD)
+            self.stdscr.addstr(0, 0, title,
+                color.get_color(color_t.WHITE, color_t.BLUE) | curses.A_BOLD)
             self.update()
             
             #Create menu window
-            m = menu(self,title)
+            m = menu.menu(self, title)
             m.show_menu(menu_list)
 
-        except:
-            success = False
-        finally:
+        except Exception as e:
             #End GUI
             self.stdscr.keypad(0)
             curses.echo()
             curses.nocbreak()
             curses.endwin()
-            if not success:
-                traceback.print_exc()
+            traceback.print_exc()
+            raise e
+        else:
+            #End GUI
+            self.stdscr.keypad(0)
+            curses.echo()
+            curses.nocbreak()
+            curses.endwin()
+                
         
     def update(self):
         self.stdscr.refresh()

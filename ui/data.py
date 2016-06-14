@@ -29,8 +29,7 @@ class utf8buf:
         self.buf.append(c)
         self.len = self.len - 1
         if self.len == 0:
-            e = encoder()
-            ret = e.encode(self.get_char())
+            ret = self.get_char()
             self.buf = []
             return ret
         return None
@@ -54,20 +53,6 @@ class utf8buf:
         for t in self.buf:
             c + chr(t)
         return c.decode("utf-8");
-
-class encoder:
-    def __init__(self):
-        self.code = locale.getpreferredencoding()
-        return
-        
-    def convert(self,str):
-        return str.decode('utf-8','ignore').encode(self.code)
-        
-    def encode(self,str):
-        return str.encode(self.code)
-        
-    def unconvert(self,str):
-        return str.decode(self.code,'ignore').encode('utf-8')
 
 class color_t:
     BLACK = curses.COLOR_BLACK
