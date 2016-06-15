@@ -126,16 +126,18 @@ class menu:
 
 
             #Draw buttons
-            for left in range(1, int(self.rect.width - 1)):
-                self.wnd.addch(int(self.rect.height - 2), int(left), ' ')
+            for left in range(1, self.rect.width - 1):
+                self.wnd.addstr(self.rect.height - 2, left, ' ', color.get_color(color_t.WHITE, color_t.WHITE))
 
             self.btn_back.draw(pos_t(self.rect.height - 2,self.rect.width / 4 - 2),0,1)
 
             if menu != []:
                 if self.index > 0:
+                    pass
                     self.btn_prev.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 2 - 2),0,1)
             
                 if self.index + 1 < len(self.page):
+                    pass
                     self.btn_next.draw(pos_t(self.rect.height - 2,self.rect.width / 4 * 3 - 2),0,1)
 
             #Draw menu
@@ -189,23 +191,31 @@ class menu:
     def draw_wnd(self):
         #Compute window size
         parent_rect = self.scr.get_size()
+        height = int(parent_rect.height * 80 / 100)
+
+        str_help_line_num = len(screen.str_help) // parent_rect.width
+        if len(screen.str_help) % parent_rect.width > 0:
+            str_help_line_num = str_help_line_num + 1
+        if (parent_rect.height - height) // 2 < str_help_line_num + 2:
+            height = parent_rect.height - (str_help_line_num + 2) * 2
+
         self.rect = rect_t(parent_rect.width * 80 / 100,
-            parent_rect.height * 80 / 100)
+            height)
         self.pos = pos_t((parent_rect.height - self.rect.height) / 2,
             (parent_rect.width - self.rect.width) / 2)
 
         color = color_t()
 
         #Draw shadow
-        shadow_color = color.get_color(color_t.BLACK,color_t.BLUE)
-        for top in range(int(self.pos.top + 1),
-            int(self.pos.top + self.rect.height + 1)):
-            self.scr.stdscr.addstr(int(top), int(self.pos.left + self.rect.width),
-                '█',shadow_color)
-        for left in range(int(self.pos.left + 1),
-            int(self.pos.left + self.rect.width)):
-            self.scr.stdscr.addstr(int(self.pos.top + self.rect.height), int(left),
-                '█',shadow_color)
+        shadow_color = color.get_color(color_t.BLACK,color_t.BLUE) | curses.A_REVERSE
+        for top in range(int(self.pos.top) + 1,
+            int(self.pos.top) + int(self.rect.height) + 1):
+            self.scr.stdscr.addstr(int(top), int(self.pos.left) + int(self.rect.width),
+                ' ',shadow_color)
+        for left in range(self.pos.left + 1,
+            self.pos.left + self.rect.width):
+            self.scr.stdscr.addstr(self.pos.top + self.rect.height, int(left),
+                ' ',shadow_color)
         self.scr.stdscr.refresh()
         
         #Draw window

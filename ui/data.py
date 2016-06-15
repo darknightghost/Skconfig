@@ -81,8 +81,8 @@ class pos_t:
         self.left = 0
         
     def __init__(self,top,left):
-        self.top = top
-        self.left = left
+        self.top = int(top)
+        self.left = int(left)
 
 class rect_t:
     def __init__(self):
@@ -90,8 +90,8 @@ class rect_t:
         self.height = 0
         
     def __init__(self,width,height):
-        self.width = width
-        self.height = height
+        self.width = int(width)
+        self.height = int(height)
 
 class region_t:
     def __init__(self):

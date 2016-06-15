@@ -25,7 +25,8 @@ class button(control):
 		self.text = data[0]
 		self.on_click = data[1]
 		c = color_t()
-		self.color = c.get_color(color_t.WHITE,color_t.RED) | curses.A_BOLD
+		self.color = c.get_color(color_t.WHITE, color_t.RED) | curses.A_BOLD
+		self.focused_color = c.get_color(color_t.RED, color_t.BLACK) | curses.A_BOLD
 	
 	def draw(self,pos,begin,max):
 		self.pos = pos
@@ -36,7 +37,7 @@ class button(control):
 		return rect_t(len(self.text) + 2,1)
 	
 	def on_get_focus(self):
-		self.wnd.addstr(int(self.pos.top), int(self.pos.left), "<%s>"%(self.text),self.color | curses.A_REVERSE)
+		self.wnd.addstr(int(self.pos.top), int(self.pos.left), "<%s>"%(self.text),self.focused_color)
 		self.wnd.refresh()
 		return
 	

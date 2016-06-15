@@ -46,6 +46,7 @@ class screen:
     "textbox"       string                                      TextBox
     "listcontrol"   [[text1,text2,text3...],selected-index]     Show a list and select one
     '''
+    str_help = "Press <ESC> to return.Press <Page Up>, <Page Down> to switch pages.Press <↑>, <↓>, <←>, <→> to switch focus in one window.Press <TAB> to switch focus among all windows."
     def __init__(self):
         locale.setlocale(locale.LC_ALL, '')
         self.stdscr = None
@@ -53,12 +54,11 @@ class screen:
         self.height = 0
 
     def screen_main(self,menu_list,title):
-        success = True
         try:
             #Begin GUI
             self.stdscr = curses.initscr()
-            self.height = self.stdscr.getmaxyx()[0]
-            self.width = self.stdscr.getmaxyx()[1]
+            self.height = self.stdscr.getmaxyx()[0] + 1
+            self.width = self.stdscr.getmaxyx()[1] + 1
             curses.noecho()
             curses.cbreak()
             self.stdscr.keypad(1)
@@ -71,6 +71,14 @@ class screen:
             curses.curs_set(0)
             self.stdscr.addstr(0, 0, title,
                 color.get_color(color_t.WHITE, color_t.BLUE) | curses.A_BOLD)
+            
+            str_help_line_num = len(screen.str_help) // self.width
+            if len(screen.str_help) % self.width > 0:
+                str_help_line_num = str_help_line_num + 1
+                
+            self.stdscr.addstr(self.height - 1 - str_help_line_num, 0, screen.str_help,
+                color.get_color(color_t.WHITE, color_t.BLUE) | curses.A_BOLD)
+            
             self.update()
             
             #Create menu window

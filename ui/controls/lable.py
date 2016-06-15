@@ -31,9 +31,11 @@ class lable(control):
         #Split text
         self.lines = []
         for l in self.text.split("\n"):
-            while len(l) > 0:
+            while True:
                 self.lines.append(l[ : self.text_width].strip())
                 l = l[self.text_width : ]
+                if len(l) <= 0:
+                    break;
 
     def draw(self,pos,begin,max):
         self.pos = pos

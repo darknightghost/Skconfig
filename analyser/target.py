@@ -243,11 +243,12 @@ class target:
         self.menu.append(["lable", self.introduction, None])
         
         #Dependencies
-        dep_str = "Required targets:"
+        dep_str = "\Required targets:"
         for d in self.dependencies:
             dep_str = dep_str + "\n    " + target.target_dict[d].name
             self.menu.append(["lable", dep_str, None])
         
+        self.menu.append(["lable", "", None])
         self.menu.append(["lable", "Architecture:", None])
         #Actived arch
         if self.is_root:
@@ -269,13 +270,15 @@ class target:
         self.menu.append(["submenu", "Architecture settings" , arch_setting_menu])
 
         #Build options
-        self.menu.append(["lable", "Build options::", None])
+        self.menu.append(["lable", "", None])
+        self.menu.append(["lable", "Build options:", None])
         option_menu = []
         for opt in self.options:
             option_menu.append(opt.open_menu())
         self.menu.append(["submenu", "Build options" , option_menu])
         
         #Sub targets
+        self.menu.append(["lable", "", None])
         self.menu.append(["lable", "Sub targets:", None])
         sub_targets_menu = []
         for t in self.sub_targets:
