@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><target name="a" type="build">
-    <output name="a" />
-    <outdir path="../../bin/$(name)" />
-    <middir path="../../obj/$(name)" />
+    <output name="a"/>
+    <outdir path="../../bin/$(name)"/>
+    <middir path="../../obj/$(name)"/>
     <introduction>This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
         This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
     </introduction>
     <archs>
         <arch name="x86">
-            <PREV>echo prev</PREV>
+            <PREV>echo prevaaa</PREV>
             <DEP>gcc</DEP>
             <DEPRULE>$(DEP) -MM -o $@ $&lt;;if [ $$? == 0 ];then cat $@|awk 'NR == 1 {printf(&quot;%s%s\n&quot;,&quot;$(OBJDIR)/$(ARCH)/&quot;,$$0)} NR != 1 {print $$0}' &gt; $@; fi</DEPRULE>
             <CC>gcc</CC>
@@ -38,7 +38,7 @@
         </arch>
     </archs>
     <dependencies>
-        <dep path="../b/target.xml" />
+        <dep path="../b/target.xml"/>
     </dependencies>
     <sub-targets>
     </sub-targets>

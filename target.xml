@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?><target name="test all" type="virtual">
-    <output name="输出文件名" />
-    <outdir path="输出目录" />
-    <middir path="中间文件目录" />
+    <output name="输出文件名"/>
+    <outdir path="输出目录"/>
+    <middir path="中间文件目录"/>
     <introduction>
       This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation,
       aaaaaa
     </introduction>
-    <archs actived="x86">
+    <archs actived="arm.raseberry">
         <arch name="x86">
             <PREV>echo prev</PREV>
             <DEP>gcc</DEP>
@@ -41,8 +41,8 @@
     <dependencies>
     </dependencies>
     <sub-targets>
-        <target enable="true" path="src/a/target.xml" />
-        <target enable="true" path="src/b/target.xml" />
+        <target enable="true" path="src/a/target.xml"/>
+        <target enable="true" path="src/b/target.xml"/>
     </sub-targets>
     <options>
     </options>

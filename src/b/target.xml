@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><target name="b" type="build">
-    <output name="b" />
-    <outdir path="../../bin/$(name)" />
-    <middir path="../../obj/$(name)" />
+    <output name="b"/>
+    <outdir path="../../bin/$(name)"/>
+    <middir path="../../obj/$(name)"/>
     <introduction>This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
         This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.This is a test.
     </introduction>
@@ -42,5 +42,18 @@
     <sub-targets>
     </sub-targets>
     <options>
+        <option enable="false" name="Test QQQ" target="CFLAGS|ASFLAGS" type="checkbox" value="-DQQQ"/>
+        <option name="WWWW" selected="1" target="CFLAGS|ASFLAGS" type="list">
+            <item name="EEE" value="-DEEE"/>
+            <item name="RRR" value="-DRRR"/>
+        </option>
+        <option marco="-DCOMMENT" name="Comment" type="input" value="hahahaha"/>
+        <option name="Early print options" type="menu">
+            <option enable="true" name="Test ZZZ" target="CFLAGS|ASFLAGS" type="checkbox" value="-DZZZ"/>
+            <option name="XXX" selected="0" target="CFLAGS|ASFLAGS" type="list">
+                <item name="CCC" value="-DCCC"/>
+                <item name="VVV" value="-DVVV"/>
+            </option>
+        </option>
     </options>
 </target>

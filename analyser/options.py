@@ -22,28 +22,31 @@ class options:
     def __init__(self, node, path):
         self.root = node
         self.path = path
-        self.__load()
+        self.__load__()
 
     def close(self):
-        self.__restore()
+        self.__restore__()
 
-    def __load(self):
-        pass
+    def __load__(self):
+        raise Exception("abstract")
 
-    def __restore(self):
-        pass
+    def __restore__(self):
+        raise Exception("abstract")
 
     def open_menu(self):
-        pass
+        raise Exception("abstract")
 
     def close_menu(self):
-        pass
+        raise Exception("abstract")
 
     def configure(self):
-        pass
+        raise Exception("abstract")
 
 class opt_checkbox(options):
-    def __load(self):
+    def __str__(self):
+        return "%12s: %s"%("Build option", self.value)
+        
+    def __load__(self):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()
@@ -73,7 +76,7 @@ class opt_checkbox(options):
         
         return
 
-    def __restore(self):
+    def __restore__(self):
         self.root.setAttribute("enable", str(self.enable).lower())
         return
 
@@ -90,7 +93,10 @@ class opt_checkbox(options):
         pass
 
 class opt_list(options):
-    def __load(self):
+    def __str__(self):
+        return "%12s: %s"%("Build option", self.items[self.selected][1])
+
+    def __load__(self):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()
@@ -101,6 +107,8 @@ class opt_list(options):
         try:
             self.selected = int(self.root.getAttribute("selected").encode('utf-8').decode())
         except IndexError:
+            raise MissingAttribute(self.path, "option", "selected")
+        except ValueError:
             raise MissingAttribute(self.path, "option", "selected")
 
         #target
@@ -116,16 +124,19 @@ class opt_list(options):
         #[name, value]
         self.items = []
         for item in self.root.getElementsByTagName("item"):
-            self.name.append([item.getAttribute("name").encode('utf-8').decode(),
+            self.items.append([item.getAttribute("name").encode('utf-8').decode(),
                 item.getAttribute("value").encode('utf-8').decode()])
         return
 
-    def __restore(self):
+    def __restore__(self):
         self.root.setAttribute("selected", str(self.selected))
         return
 
     def open_menu(self):
-        self.menu = ["listcontrol", self.name, [self.items, self.selected]]
+        item_name_list = []
+        for n in self.items:
+            item_name_list.append(n[0])
+        self.menu = ["listcontrol", self.name, [item_name_list, self.selected]]
         return self.menu
 
     def close_menu(self):
@@ -136,7 +147,10 @@ class opt_list(options):
         pass
 
 class opt_input(options):
-    def __load(self):
+    def __str__(self):
+        return "%12s: %s=%s"%("Build option", self.macro, self.value)
+
+    def __load__(self):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()
@@ -166,7 +180,7 @@ class opt_input(options):
 
         return
 
-    def __restore(self):
+    def __restore__(self):
         self.root.setAttribute("value", self.value)
         return
 
@@ -182,7 +196,13 @@ class opt_input(options):
         pass
 
 class opt_menu(options):
-    def __load(self):
+    def __str__(self):
+        ret = ""
+        for opt in self.options:
+            ret = ret + str(opt)
+        return ret
+
+    def __load__(self):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()

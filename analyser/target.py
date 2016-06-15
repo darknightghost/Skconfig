@@ -43,7 +43,7 @@ class target:
             self.is_root = True
         else:
             self.is_root = False
-        self.__load(actived_arch)
+        self.__load__(actived_arch)
         os.chdir(old_path)
 
     def __del__(self):
@@ -88,14 +88,14 @@ class target:
         
         #Sub targets
         for t in self.sub_targets:
-            t.close()
+            t[1].close()
         
         #Options
         for t in self.options:
             t.close()
         
         target.target_dict.pop(self.path)
-        self.__restore()
+        self.__restore__()
         try:
             self.file.seek(0,0)
             self.file.truncate(0)
@@ -107,7 +107,7 @@ class target:
         self.dom = None
         return
 
-    def __load(self, actived_arch):
+    def __load__(self, actived_arch):
         #Name
         self.name = self.root.getAttribute("name").encode('utf-8').decode()
         
@@ -227,7 +227,7 @@ class target:
 
         return
 
-    def __restore(self):
+    def __restore__(self):
         #Actived arch
         if self.is_root:
             self.archs_node.setAttribute("actived", self.arch_name)
@@ -243,7 +243,7 @@ class target:
         self.menu.append(["lable", self.introduction, None])
         
         #Dependencies
-        dep_str = "\Required targets:"
+        dep_str = "\nRequired targets:"
         for d in self.dependencies:
             dep_str = dep_str + "\n    " + target.target_dict[d].name
             self.menu.append(["lable", dep_str, None])
@@ -270,24 +270,26 @@ class target:
         self.menu.append(["submenu", "Architecture settings" , arch_setting_menu])
 
         #Build options
-        self.menu.append(["lable", "", None])
-        self.menu.append(["lable", "Build options:", None])
-        option_menu = []
-        for opt in self.options:
-            option_menu.append(opt.open_menu())
-        self.menu.append(["submenu", "Build options" , option_menu])
+        if len(self.options) > 0:
+            self.menu.append(["lable", "", None])
+            self.menu.append(["lable", "Build options:", None])
+            option_menu = []
+            for opt in self.options:
+                option_menu.append(opt.open_menu())
+            self.menu.append(["submenu", "Build options" , option_menu])
         
         #Sub targets
-        self.menu.append(["lable", "", None])
-        self.menu.append(["lable", "Sub targets:", None])
-        sub_targets_menu = []
-        for t in self.sub_targets:
-            sub_targets_menu.append(["lable", "Target:" + t[1].name, None])
-            c = ["checkbox", "Build this target", t[2]]
-            sub_targets_menu.append(c)
-            t[3] = c
-            sub_targets_menu.append(["submenu", t[1].name + " options", t[1].open_menu()])
-        self.menu.append(["submenu", "Sub targets options" , sub_targets_menu])
+        if len(self.sub_targets) > 0:
+            self.menu.append(["lable", "", None])
+            self.menu.append(["lable", "Sub targets:", None])
+            sub_targets_menu = []
+            for t in self.sub_targets:
+                sub_targets_menu.append(["lable", "Target:" + t[1].name, None])
+                c = ["checkbox", "Build this target", t[2]]
+                sub_targets_menu.append(c)
+                t[3] = c
+                sub_targets_menu.append(["submenu", t[1].name + " options", t[1].open_menu()])
+            self.menu.append(["submenu", "Sub targets options" , sub_targets_menu])
         
         return self.menu
 

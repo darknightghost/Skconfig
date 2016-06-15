@@ -33,7 +33,7 @@ class arch:
         self.path = path
         self.root = node
         self.dom = dom
-        self.__load(parent)
+        self.__load__(parent)
 
     def __str__(self):
         ret = "Architecture \"%s\":"%(self.name)
@@ -44,12 +44,12 @@ class arch:
         return ret
 
     def close(self):
-        self.restore()
+        self.__restore__()
 
     def regist(self, dict):
         dict[self.name] = self
 
-    def __load(self, parent):
+    def __load__(self, parent):
         #name
         try:
             self.name = self.root.getAttribute("name").encode('utf-8').decode()
@@ -71,7 +71,7 @@ class arch:
                 
         return
 
-    def __restore(self):
+    def __restore__(self):
         #Makeflie variables
         #[node, value]
         for k in arch.tag_list:
