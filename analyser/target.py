@@ -31,6 +31,9 @@ def get_child_tags_by_name(parent, name):
     return ret
 
 class target:
+    KEEP = 0
+    RESERVE = 1
+    CONFLICT = 3
     target_dict = {}
     def __init__(self, path, actived_arch = None):
         self.path = os.path.abspath(path)
@@ -111,8 +114,10 @@ class target:
         #Name
         self.name = self.root.getAttribute("name").encode('utf-8').decode()
         
-        #Name
+        #type
         self.build_type = self.root.getAttribute("type").encode('utf-8').decode()
+        if self.build_type != "build" and self.build_type != "virtual":
+            raise MissingAttribute(self.path, "target", "type")
         
         #Output file name
         try:
@@ -319,3 +324,53 @@ class target:
 
     def configure(self):
         pass
+
+    def get_sub_targets(self):
+        ret = []
+        for l in self.sub_targets:
+            if l[2]:
+                ret.append(l[1])
+        return ret
+    
+    def get_all_sub_targets(self):
+        ret = []
+        for l in self.sub_targets:
+            if l[2]:
+                ret.append(l[1])
+                ret = ret + l[1].get_all_sub_targets()
+        return ret
+    
+    def get_dependencies(self):
+        sub_targets = self.get_all_sub_targets()
+        ret = []
+
+        for p in self.dependencies:
+            ret.append(target.target_dict[p])
+            
+        for t in sub_targets:
+            ret = ret + t.get_dependencies()
+
+        for d in ret:
+            if d in sub_targets:
+                ret.remove(d)
+        
+        return ret
+    
+    def check_order(t1, t2):
+        t1_deps = t1.get_dependencies()
+        t2_deps = t2.get_dependencies()
+        t1_subs = t1.get_all_sub_targets()
+        t2_subs = t2.get_all_sub_targets()
+        
+        t1_subs.append(t1)
+        t2_subs.append(t2)
+        
+        if len(list(set(t1_subs) & set(t2_deps))) > 0:
+            if len(list(set(t2_subs) & set(t1_deps))) > 0:
+                return target.CONFLICT
+            else:
+                return target.KEEP
+        elif len(list(set(t2_subs) & set(t1_deps))) > 0:
+            return target.RESERVE
+        else:
+            return target.KEEP

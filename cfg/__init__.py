@@ -15,10 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from cfg import configure
-from analyser import *
-
-root_target = target("target.xml")
-build_tree = configure.configure(root_target)
-configure.create_makefile(build_tree)
-root_target.close()
+from analyser.target import *
+from analyser.arch import *
+from analyser.target_exceptions import *

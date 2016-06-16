@@ -15,10 +15,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from cfg import configure
-from analyser import *
-
-root_target = target("target.xml")
-build_tree = configure.configure(root_target)
-configure.create_makefile(build_tree)
-root_target.close()
+class ConfilctDepecncency(Exception):
+    def __init__(self, t1_name, t2_name):
+        self.t1_name = t1_name
+        self.t2_name = t2_name
+        
+    def __str__(self):
+        return "Conflict target : \"%s\" \"%s\"."%(self.t1_name, self.t2_name)
+    
+class MissingDepecncency(Exception):
+    def __init__(self, deps):
+        self.missing_names = ""
+        for t in deps:
+            if self.missing_names == "":
+                self.missing_names = self.missing_names + "\"%s\""%(t.name)
+            else:
+                self.missing_names = self.missing_names + ", \"%s\""%(t.name)
+        
+    def __str__(self):
+        return "Missing depencencies : %s."%(self.missing_names)

@@ -38,6 +38,7 @@
         </arch>
     </archs>
     <dependencies>
+        <dep path="../a/target.xml"/>
     </dependencies>
     <sub-targets>
     </sub-targets>
