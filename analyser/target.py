@@ -330,7 +330,8 @@ class target:
         for opt in self.options:
             build_dict = opt.configure(build_dict)
             
-        ret = ["ARCH = " + self.arch_name,
+        ret = ["NAME = " + self.name,
+               "ARCH = " + self.arch_name,
                "OUTPUT = " + self.output,
                "OUTDIR = " + self.outdir,
                "MIDDIR = " + self.middir]

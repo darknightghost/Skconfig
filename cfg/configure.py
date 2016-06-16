@@ -61,8 +61,68 @@ def create_makefile(build_tree):
         
         #Scan source files
         sources = scan_sources(cur_target.arch_name)
+        #filelist = [[source, obj, dep], [source, obj, dep], ...]
+        filelist = []
+        linkfile = "$(MIDDIR)/$(NAME).linked"
+        for s in sources:
+            basename = os.path.splitext(s)[0]
+            filelist.append([s,
+                "$(MIDDIR)/" + basename + ".obj",
+                "$(MIDDIR)/" + basename + ".dep",])
 
         #Create Makefile
+        print("Create Makefile...")
+        makefile = open("Makefile", "w")
+        
+        #Build options
+        print("Writing building options...")
+        for line in cfg_settings:
+            makefile.write(line + "\n")
+        makefile.write("\n")
+        
+        print("Writing building rules...")
+        makefile.write(".PHONY : all clean delete rebuild subtarget target\n\n")
+        
+        #all
+        makefile.write("all : target\n\n")
+        
+        #clean
+        makefile.write("clean : \n")
+        rm_list = ""
+        for f in filelist:
+            if rm_list != "":
+                rm_list = rm_list + " "
+            rm_list = rm_list + f[1] + " " + f[2]
+        rm_list = rm_list + " " + linkfile
+        makefile.write("\trm -f %s\n"%(rm_list.strip()))
+        makefile.write("\n")
+        
+        #delete
+        makefile.write("delete : \n")
+        rm_list = ""
+        for f in filelist:
+            if rm_list != "":
+                rm_list = rm_list + " "
+            rm_list = rm_list + f[1] + " " + f[2]
+        rm_list = rm_list + " " + linkfile + " $(OUTDIR)/$(OUTPUT)"
+        makefile.write("\trm -f %s\n"%(rm_list.strip()))
+        makefile.write("\n")
+        
+        #rebuild
+        makefile.write("rebuild : \n")
+        makefile.write("\tmake delete\n")
+        makefile.write("\tmake all\n")
+        makefile.write("\n")
+        
+        #target
+        makefile.write("target : subtarget\n\n")
+        
+        #subtarget
+        
+        #link
+        
+        #sources
+        
         
     else:
         #virtual
@@ -71,6 +131,17 @@ def create_makefile(build_tree):
         cfg_settings = cur_target.configure()
 
         #Create Makefile
+        print("Create Makefile...")
+        makefile = open("Makefile", "w")
+        makefile.writelines(cfg_settings)
+        for line in cfg_settings:
+            makefile.write(line + "\n")
+        makefile.write("\n")
+        
+        print("Writing building rules...")
+        makefile.write(".PHONY : all clean delete rebuild\n\n")
+    
+    makefile.close()
     
     #Change working directory
     os.chdir(old_dir)
