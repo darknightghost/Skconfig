@@ -323,7 +323,22 @@ class target:
         return
 
     def configure(self):
-        pass
+        #Arch
+        build_dict = self.actived_arch.configure()
+        
+        #Options
+        for opt in self.options:
+            build_dict = opt.configure(build_dict)
+            
+        ret = ["ARCH = " + self.arch_name,
+               "OUTPUT = " + self.output,
+               "OUTDIR = " + self.outdir,
+               "MIDDIR = " + self.middir]
+        
+        for k in arch.tag_list:
+            ret.append(k + " = " + build_dict[k])
+        
+        return ret
 
     def get_sub_targets(self):
         ret = []

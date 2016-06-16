@@ -20,6 +20,7 @@ from analyser.arch import *
 from analyser.target_exceptions import *
 from cfg.err import *
 import os
+import stat
 
 '''
     Data structure of build tree:
@@ -56,13 +57,18 @@ def create_makefile(build_tree):
         #build
         print("Target type : build")
         
+        cfg_settings = cur_target.configure()
+        
         #Scan source files
         sources = scan_sources(cur_target.arch_name)
+
         #Create Makefile
         
     else:
         #virtual
         print("Target type : virtual")
+        
+        cfg_settings = cur_target.configure()
 
         #Create Makefile
     
@@ -98,4 +104,33 @@ def sort_build_tree(build_tree):
     return
 
 def scan_sources(arch_name):
-    pass
+    name_list = [""] + arch_name.split(".")
+    source_list = []
+    for n in range(0, len(name_list)):
+        #Open source list file
+        file_name = "sources"
+        for i in range(0, len(name_list) - n):
+            if i > 0:
+                file_name = file_name + "." + name_list[i]
+        try:
+            print("\nTrying to open file : \"%s\"."%(file_name))
+            source_file = open(file_name, "r")
+        except FileNotFoundError:
+            print("File does not exists.")
+            continue
+        
+        #Get source list
+        for line in source_file.readlines():
+            line = line.strip().split('#')[0]
+            if line != "":
+                print("Checking source file : \"%s\"."%(line))
+                if not os.path.exists(line):
+                    raise MissingSourceFile(line)
+                
+                if os.path.isdir(line):
+                    raise SourceFileIsDir(line)
+                
+                source_list.append(line)
+        source_file.close()
+        
+    return source_list

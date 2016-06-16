@@ -39,7 +39,7 @@ class options:
     def close_menu(self):
         raise Exception("abstract")
 
-    def configure(self):
+    def configure(self, dict):
         raise Exception("abstract")
 
 class opt_checkbox(options):
@@ -72,7 +72,9 @@ class opt_checkbox(options):
             raise MissingAttribute(self.path, "option", "target")
         self.targets = []
         for k in target_str.split("|"):
-            self.targets.append(k.split())
+            k = k.strip()
+            if k != "":
+                self.targets.append(k)
         
         return
 
@@ -89,8 +91,14 @@ class opt_checkbox(options):
         self.menu = None
         return
 
-    def configure(self):
-        pass
+    def configure(self, dict):
+        if self.enable:
+            for k in self.targets:
+                if dict[k] != "":
+                    dict[k] = dict[k] + " "
+                dict[k] = dict[k] + self.value
+            
+        return dict
 
 class opt_list(options):
     def __str__(self):
@@ -118,7 +126,9 @@ class opt_list(options):
             raise MissingAttribute(self.path, "option", "target")
         self.targets = []
         for k in target_str.split("|"):
-            self.targets.append(k.split())
+            k = k.strip()
+            if k != "":
+                self.targets.append(k)
 
         #item
         #[name, value]
@@ -143,8 +153,13 @@ class opt_list(options):
         self.selected = self.menu[2][1]
         self.menu = None
 
-    def configure(self):
-        pass
+    def configure(self, dict):
+        for k in self.targets:
+            if dict[k] != "":
+                dict[k] = dict[k] + " "
+            dict[k] = dict[k] + self.items[self.selected][1]
+            
+        return dict
 
 class opt_input(options):
     def __str__(self):
@@ -176,7 +191,9 @@ class opt_input(options):
             raise MissingAttribute(self.path, "option", "target")
         self.targets = []
         for k in target_str.split("|"):
-            self.targets.append(k.split())
+            k = k.strip()
+            if k != "":
+                self.targets.append(k)
 
         return
 
@@ -192,8 +209,13 @@ class opt_input(options):
         self.value = self.menu[2]
         self.menu = None
 
-    def configure(self):
-        pass
+    def configure(self, dict):
+        for k in self.targets:
+            if dict[k] != "":
+                dict[k] = dict[k] + " "
+            dict[k] = dict[k] + self.marco + "=" + self.value
+            
+        return dict
 
 class opt_menu(options):
     def __str__(self):
@@ -233,8 +255,11 @@ class opt_menu(options):
         self.menu = None
         return
 
-    def configure(self):
-        pass
+    def configure(self, dict):
+        for o in self.options:
+            dict = o.configure(dict)
+            
+        return dict
 
 OPTION_DICT = {"checkbox" : opt_checkbox,
     "list" : opt_list,

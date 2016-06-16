@@ -34,3 +34,17 @@ class MissingDepecncency(Exception):
         
     def __str__(self):
         return "Missing depencencies : %s."%(self.missing_names)
+    
+class MissingSourceFile(Exception):
+    def __init__(self, path):
+        self.path = path
+        
+    def __str__(self):
+        return "Missing source file : \"%s\"."%(self.path)
+    
+class SourceFileIsDir(Exception):
+    def __init__(self, path):
+        self.path = path
+        
+    def __str__(self):
+        return "Source file : \"%s\" is a directory."%(self.path)
