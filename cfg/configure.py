@@ -63,7 +63,7 @@ def create_makefile(build_tree):
         sources = scan_sources(cur_target.arch_name)
         #filelist = [[source, obj, dep], [source, obj, dep], ...]
         filelist = []
-        linkfile = "$(MIDDIR)/$(NAME).linked"
+        linkfile = "$(MIDDIR)/$(NAME).$(ARCH).linked"
         for s in sources:
             basename = os.path.splitext(s)[0]
             filelist.append([s,
@@ -78,6 +78,7 @@ def create_makefile(build_tree):
         print("Writing building options...")
         for line in cfg_settings:
             makefile.write(line + "\n")
+        makefile.write("LINKED = %s\n"%(linkfile))
         makefile.write("\n")
         
         print("Writing building rules...")
@@ -88,6 +89,10 @@ def create_makefile(build_tree):
         
         #clean
         makefile.write("clean : \n")
+        if len(build_tree[1]) > 0:
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make clean\n"
+                makefile.write(cmd)
         rm_list = ""
         for f in filelist:
             if rm_list != "":
@@ -99,6 +104,10 @@ def create_makefile(build_tree):
         
         #delete
         makefile.write("delete : \n")
+        if len(build_tree[1]) > 0:
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make clean\n"
+                makefile.write(cmd)
         rm_list = ""
         for f in filelist:
             if rm_list != "":
@@ -110,19 +119,54 @@ def create_makefile(build_tree):
         
         #rebuild
         makefile.write("rebuild : \n")
+        if len(build_tree[1]) > 0:
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make clean\n"
+                makefile.write(cmd)
         makefile.write("\tmake delete\n")
         makefile.write("\tmake all\n")
         makefile.write("\n")
         
         #target
-        makefile.write("target : subtarget\n\n")
+        if len(build_tree[1]) > 0:
+            makefile.write("target : subtarget\n")
+        else:
+            makefile.write("target :\n")
+        makefile.write("\t$(PREV)\n")
+        makefile.write("\tmake $(LINKED)\n")
+        makefile.write("\t$(AFTER)\n")
+        makefile.write("\n")
         
         #subtarget
-        
+        if len(build_tree[1]) > 0:
+            makefile.write("subtarget :\n")
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make clean\n"
+                makefile.write(cmd)
+            makefile.write("\n")
+
         #link
+        link_deps = ""
+        for f in filelist:
+            link_deps = link_deps + " " + f[1]
+        link_deps = link_deps.strip()
+        makefile.write("$(LINKED) : %s\n"%(link_deps))
+        makefile.write("\t$(LDRULE)\n")
+        makefile.write("\n")
         
         #sources
-        
+        for f in filelist:
+            makefile.write("sinclude %s\n"%(f[2]))
+            makefile.write("%s : %s\n"%(f[2], f[0]))
+            makefile.write("\tmkdir -p $(dir $@)\n")
+            makefile.write("\t$(DEPRULE)\n")
+            makefile.write("%s : %s\n"%(f[1], f[0]))
+            makefile.write("\tmkdir -p $(dir $@)\n")
+            if os.path.splitext(f[0]) in (".s", ".S"):
+                makefile.wrilte("\t$(ASRULE)")
+            elif os.path.splitext(f[0]) in (".c", ".cc", ".C", ".cpp"):
+                makefile.wrilte("\t$(CCRULE)")
+            makefile.write("\n")
         
     else:
         #virtual
@@ -133,13 +177,44 @@ def create_makefile(build_tree):
         #Create Makefile
         print("Create Makefile...")
         makefile = open("Makefile", "w")
-        makefile.writelines(cfg_settings)
         for line in cfg_settings:
             makefile.write(line + "\n")
         makefile.write("\n")
         
         print("Writing building rules...")
         makefile.write(".PHONY : all clean delete rebuild\n\n")
+        
+        #all
+        makefile.write("all :\n")
+        makefile.write("\t$(PREV)\n")
+        if len(build_tree[1]) > 0:
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make all\n"
+                makefile.write(cmd)
+        makefile.write("\t$(AFTER)\n")
+        makefile.write("\n")
+        
+        #clean
+        makefile.write("clean :\n")
+        if len(build_tree[1]) > 0:
+            for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make clean\n"
+                makefile.write(cmd)
+        makefile.write("\n")
+        
+        #delete
+        makefile.write("delete :\n")
+        for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make delete\n"
+                makefile.write(cmd)
+        makefile.write("\n")
+        
+        #rebuild
+        makefile.write("rebuild :\n")
+        for s in build_tree[1]:
+                cmd = "\tcd " + os.path.dirname(s[0].path) + ";make rebuild\n"
+                makefile.write(cmd)
+        makefile.write("\n")
     
     makefile.close()
     
@@ -192,7 +267,7 @@ def scan_sources(arch_name):
         
         #Get source list
         for line in source_file.readlines():
-            line = line.strip().split('#')[0]
+            line = line.strip().split('#')[0].strip()
             if line != "":
                 print("Checking source file : \"%s\"."%(line))
                 if not os.path.exists(line):
