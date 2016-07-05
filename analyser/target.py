@@ -125,7 +125,7 @@ class target:
         except IndexError:
             raise MissingTag(self.path, "output")
         self.output = self.output_node.getAttribute("name").encode('utf-8').decode()
-        if self.output == "":
+        if self.output == "" and self.build_type != "virtual":
             raise MissingAttribute(self.path, "output", "name")
 
         #Output dir
@@ -134,7 +134,7 @@ class target:
         except IndexError:
             raise MissingTag(self.path, "outdir")
         self.outdir = self.outdir_node.getAttribute("path").encode('utf-8').decode()
-        if self.output == "":
+        if self.output == "" and self.build_type != "virtual":
             raise MissingAttribute(self.path, "outdir", "path")
 
         #Middie dir
@@ -143,7 +143,7 @@ class target:
         except IndexError:
             raise MissingTag(self.path, "middir")
         self.middir = self.middir_node.getAttribute("path").encode('utf-8').decode()
-        if self.middir == "":
+        if self.middir == "" and self.build_type != "virtual":
             raise MissingAttribute(self.path, "middir", "path")
 
         #Introduction
@@ -191,7 +191,9 @@ class target:
         except KeyError:
             if actived_arch == None:
                 raise MissingArch(self.path, self.arch_name)
-
+            else:
+                self.actived_arch = actived_arch
+        
         #Dependencies
         self.dependencies = []
         try:
