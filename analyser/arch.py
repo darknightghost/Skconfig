@@ -76,7 +76,7 @@ class arch:
         #[node, value]
         for k in arch.tag_list:
             if len(self.build_dict[k][0].childNodes) == 0:
-                self.build_dict[k][0].appendChild(dom.createTextNode(self.build_dict[k][1]))
+                self.build_dict[k][0].appendChild(self.dom.createTextNode(self.build_dict[k][1]))
             else:
                 self.build_dict[k][0].childNodes[0].nodeValue = self.build_dict[k][1]
 
