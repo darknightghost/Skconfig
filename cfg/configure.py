@@ -132,6 +132,7 @@ def create_makefile(build_tree):
             makefile.write("target : subtarget\n")
         else:
             makefile.write("target :\n")
+        makefile.write("\tmkdir -p $(OUTDIR)\n")
         makefile.write("\t$(PREV)\n")
         makefile.write("\tmake $(LINKED)\n")
         makefile.write("\t$(AFTER)\n")
