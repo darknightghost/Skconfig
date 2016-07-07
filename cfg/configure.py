@@ -162,10 +162,11 @@ def create_makefile(build_tree):
             makefile.write("\t$(DEPRULE)\n")
             makefile.write("%s : %s\n"%(f[1], f[0]))
             makefile.write("\tmkdir -p $(dir $@)\n")
-            if os.path.splitext(f[0]) in (".s", ".S"):
-                makefile.wrilte("\t$(ASRULE)")
-            elif os.path.splitext(f[0]) in (".c", ".cc", ".C", ".cpp"):
-                makefile.wrilte("\t$(CCRULE)")
+            if os.path.splitext(f[0])[1] in (".s", ".S"):
+                makefile.write("\t$(ASRULE)")
+            elif os.path.splitext(f[0])[1] in (".c", ".cc", ".C", ".cpp"):
+                makefile.write("\t$(CCRULE)")
+            makefile.write("\n\trm %s"%(f[2]))
             makefile.write("\n")
         
     else:
