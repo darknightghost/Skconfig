@@ -66,9 +66,9 @@ def create_makefile(build_tree):
         linkfile = "$(MIDDIR)/$(NAME).$(ARCH).linked"
         for s in sources:
             basename = os.path.splitext(s)[0]
-            filelist.append([s,
-                "$(MIDDIR)/" + basename + ".obj",
-                "$(MIDDIR)/" + basename + ".dep",])
+            filelist.append([os.path.abspath(s),
+                os.path.abspath("$(MIDDIR)/" + basename + ".obj"),
+                os.path.abspath("$(MIDDIR)/" + basename + ".dep")])
 
         #Create Makefile
         print("Create Makefile...")
