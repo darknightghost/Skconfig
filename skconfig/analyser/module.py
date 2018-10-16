@@ -18,24 +18,51 @@
 import json
 
 '''
-    Module file format:
-        {
-            "as" : null,                //Assembler
-            "asflags" : "",             //Assembler flags
-            "cc" : null,                //Name of c compiler
-            "cflags" : "",              //C compile flags
-            "crule" : "${CC} -c",       //Command to compile c
-            "cpp" : null,               //Name of c++ compiler
-            "cppflags" : "${CFLAGS}",   //C++ compile flags
-            "cpprule" : "${CPP} -c",    //Command to compile c++
-            "ar" : null,                //Name of ar
-            "arflags" : "",             //AR flags
-            "arrule" : "",              //AR rule
-            "sources" : [               //Source files
-                "sources/*.cpp",
-                "sources/*.c"
-            ],
-            "prebuild" : [],            //Prebuild commands
-            "postbuild" : [],           //Post build commands
-        }
+    Module file / config file format:
+    {
+        "arch" : {
+            "enabled" : "i686",
+            "AS" : "${AS}",                 //Assembler
+            "ASFLAGS" : "${ASFLAGS}",       //Assembler flags
+            "CC" : ${CC},                   //Name of c compiler
+            "CFLAGS" : "${CFLAGS}",         //C compile flags
+            "CRULE" : "${CRULLE}",          //Command to compile c
+            "CPP" : "${CPP}",               //Name of c++ compiler
+            "CPPFLAGS" : "${CPPFLAGS}",     //C++ compile flags
+            "CPPRULE" : "${CPPRULE}",       //Command to compile c++
+            "DEPRULE" : "${CC} -m",         //Depdence rule
+            "AR`" : "${AR}",                 //Name of ar
+            "ARFLAGS" : "${ARFLAGS}",       //AR flags
+            "ARRULE" : "${ARRULE}",         //AR rule
+            "LD" : "${LD}",                 //Linker
+            "LDFLAGS" : "${LDFLAGS}",       //LD flags
+            "PREBUILD" : "${PREBUILD}",     //Prebuild commands
+            "POSTBUILD" : "${POSTBUILD}",   //Post build commands
+            "archs" : [
+                {
+                    "name" : "i686",                //Name
+                    "enabled" : "default",
+                    "PREFIX" : "",                  //Cross-compile prefix
+                    "AS" : "${AS}",                 //Assembler
+                    "ASFLAGS" : "${ASFLAGS}",       //Assembler flags
+                    "CC" : ${CC},                   //Name of c compiler
+                    "CFLAGS" : "${CFLAGS}",         //C compile flags
+                    "CRULE" : "${CRULLE}",          //Command to compile c
+                    "CPP" : "${CPP}",               //Name of c++ compiler
+                    "CPPFLAGS" : "${CPPFLAGS}",     //C++ compile flags
+                    "CPPRULE" : "${CPPRULE}",       //Command to compile c++
+                    "DEPRULE" : "${CC} -m",         //Depdence rule
+                    "AR`" : "${AR}",                 //Name of ar
+                    "ARFLAGS" : "${ARFLAGS}",       //AR flags
+                    "ARRULE" : "${ARRULE}",         //AR rule
+                    "LD" : "${LD}",                 //Linker
+                    "LDFLAGS" : "${LDFLAGS}",       //LD flags
+                    "PREBUILD" : "${PREBUILD}",     //Prebuild commands
+                    "POSTBUILD" : "${POSTBUILD}",   //Post build commands
+                    "archs" : [],
+                }
+            ]
+        },
+        "options" : []                      //Options
+    }
 '''

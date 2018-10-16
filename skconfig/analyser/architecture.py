@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-      Copyright 2016,暗夜幽灵 <darknightghost.cn@gmail.com>
+      Copyright 2018,王思远 <darknightghost.cn@gmail.com>
       This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ui.data import *
-from ui.screen import *
-from ui.menu import *
+class Architecture:
+    def __init__(self, cfg):
+        pass
+
+class SubArchitecture(Architecture):
+    pass
