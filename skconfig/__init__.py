@@ -14,3 +14,36 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+
+import inspect
+
+def TypeChecker(*type_args, **type_kwargs):
+    '''
+        Check types of arguments.
+
+        @TypeChecker(type_of_arg0, type_of_arg1, ...)
+        def func(arg0, arg1):
+            ...
+    '''
+    def decorator(func):
+        sig = inspect.signature(func)
+
+        #Get arguments types
+        types = sig.bind_partial(*type_args, **type_kwargs).arguments
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            #Get arguments values
+            values = sig.bind(*args, **kwargs)
+
+            #Check types
+            for name, value in bound_values.arguments.items():
+                if name in bound_types:
+                    if not isinstance(value, bound_types[name]):
+                        raise TypeError('Argument {} must be {}'.format(name, bound_types[name]))
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

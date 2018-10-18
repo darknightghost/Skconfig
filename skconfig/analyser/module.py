@@ -24,7 +24,7 @@ import json
             "enabled" : "i686",
             "AS" : "${AS}",                 //Assembler
             "ASFLAGS" : "${ASFLAGS}",       //Assembler flags
-            "CC" : ${CC},                   //Name of c compiler
+            "CC" : "${CC}",                   //Name of c compiler
             "CFLAGS" : "${CFLAGS}",         //C compile flags
             "CRULE" : "${CRULLE}",          //Command to compile c
             "CPP" : "${CPP}",               //Name of c++ compiler
@@ -36,6 +36,7 @@ import json
             "ARRULE" : "${ARRULE}",         //AR rule
             "LD" : "${LD}",                 //Linker
             "LDFLAGS" : "${LDFLAGS}",       //LD flags
+            "LDRULE" : "${LDRULE}",         //LD rule
             "PREBUILD" : "${PREBUILD}",     //Prebuild commands
             "POSTBUILD" : "${POSTBUILD}",   //Post build commands
             "archs" : [
@@ -45,7 +46,7 @@ import json
                     "PREFIX" : "",                  //Cross-compile prefix
                     "AS" : "${AS}",                 //Assembler
                     "ASFLAGS" : "${ASFLAGS}",       //Assembler flags
-                    "CC" : ${CC},                   //Name of c compiler
+                    "CC" : "${CC}",                   //Name of c compiler
                     "CFLAGS" : "${CFLAGS}",         //C compile flags
                     "CRULE" : "${CRULLE}",          //Command to compile c
                     "CPP" : "${CPP}",               //Name of c++ compiler
@@ -57,6 +58,7 @@ import json
                     "ARRULE" : "${ARRULE}",         //AR rule
                     "LD" : "${LD}",                 //Linker
                     "LDFLAGS" : "${LDFLAGS}",       //LD flags
+                    "LDRULE" : "${LDRULE}",         //LD rule
                     "PREBUILD" : "${PREBUILD}",     //Prebuild commands
                     "POSTBUILD" : "${POSTBUILD}",   //Post build commands
                     "archs" : [],
