@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 '''
       Copyright 2018,王思远 <darknightghost.cn@gmail.com>
       This program is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
 '''
     {
             "enabled": "i686",
@@ -62,8 +60,12 @@
 '''
 
 import logging
+import skconfig
+from skconfig import TypeChecker as TypeChecker
+
 
 class Architecture:
+    @TypeChecker(Architecture, dict, logging.Logger)
     def __init__(self, cfg, logger):
         self.__logger = logger
 
@@ -72,14 +74,10 @@ class Architecture:
             self._var_list = []
 
         self._var_list += [
-            "AS", "ASFLAGS", "ASRULE",
-            "CC", "CFLAGS", "CRULE",
-            "CPP", "CPPFLAGS", "CPPRULE",
-            "DEPRULE",
-            "AR", "ARFLAGS", "ARRULE",
-            "LD", "LDFLAGS" , "LDRULE",
-            "PREBUILD", "POSTBUILD"
-            ]
+            "AS", "ASFLAGS", "ASRULE", "CC", "CFLAGS", "CRULE", "CPP",
+            "CPPFLAGS", "CPPRULE", "DEPRULE", "AR", "ARFLAGS", "ARRULE", "LD",
+            "LDFLAGS", "LDRULE", "PREBUILD", "POSTBUILD"
+        ]
 
         self._load_values(cfg)
 
@@ -120,6 +118,7 @@ class Architecture:
 
 
 class SubArchitecture(Architecture):
+    @TypeChecker(SubArchitecture, dict, logging.Logger)
     def __init__(self, cfg, logger):
         self._parent = parent
         if "_var_list" not in dir(self):
@@ -129,50 +128,51 @@ class SubArchitecture(Architecture):
 
         super().__init__(cfg, logger)
 
+
 if __name__ == "__main__":
     import json
 
-    test_cfg = "{"
-            "   \"enabled\": \"i686\","
-            "   \"AS\": \"${AS}\","
-            "   \"ASFLAGS\": \"${ASFLAGS}\","
-            "   \"CC\": \"${CC}\","
-            "   \"CFLAGS\": \"${CFLAGS}\","
-            "   \"CRULE\": \"${CRULLE}\","
-            "   \"CPP\": \"${CPP}\","
-            "   \"CPPFLAGS\": \"${CPPFLAGS}\","
-            "   \"CPPRULE\": \"${CPPRULE}\","
-            "   \"DEPRULE\": \"${CC} -m\","
-            "   \"AR`\": \"${AR}\","
-            "   \"ARFLAGS\": \"${ARFLAGS}\","
-            "   \"ARRULE\": \"${ARRULE}\","
-            "   \"LD\": \"${LD}\","
-            "   \"LDFLAGS\": \"${LDFLAGS}\","
-            "   \"LDRULE\": \"${LDRULE}\","
-            "   \"PREBUILD\": \"${PREBUILD}\","
-            "   \"POSTBUILD\": \"${POSTBUILD}\","
-            "   \"archs\": [{"
-            "       \"name\": \"i686\","
-            "       \"enabled\": null,"
-            "       \"PREFIX\": \"\","
-            "       \"AS\": \"${AS}\","
-            "       \"ASFLAGS\": \"${ASFLAGS}\","
-            "       \"CC\": \"${CC}\","
-            "       \"CFLAGS\": \"${CFLAGS}\","
-            "       \"CRULE\": \"${CRULLE}\","
-            "       \"CPP\": \"${CPP}\","
-            "       \"CPPFLAGS\": \"${CPPFLAGS}\","
-            "       \"CPPRULE\": \"${CPPRULE}\","
-            "       \"DEPRULE\": \"${CC} -m\","
-            "       \"AR`\": \"${AR}\","
-            "       \"ARFLAGS\": \"${ARFLAGS}\","
-            "       \"ARRULE\": \"${ARRULE}\","
-            "       \"LD\": \"${LD}\","
-            "       \"LDFLAGS\": \"${LDFLAGS}\","
-            "       \"LDRULE\": \"${LDRULE}\","
-            "       \"PREBUILD\": \"${PREBUILD}\","
-            "       \"POSTBUILD\": \"${POSTBUILD}\","
-            "       \"archs\": []"
-            "   }]"
+    test_cfg = "{" \
+            "   \"enabled\": \"i686\"," \
+            "   \"AS\": \"${AS}\"," \
+            "   \"ASFLAGS\": \"${ASFLAGS}\"," \
+            "   \"CC\": \"${CC}\"," \
+            "   \"CFLAGS\": \"${CFLAGS}\"," \
+            "   \"CRULE\": \"${CRULLE}\"," \
+            "   \"CPP\": \"${CPP}\"," \
+            "   \"CPPFLAGS\": \"${CPPFLAGS}\"," \
+            "   \"CPPRULE\": \"${CPPRULE}\"," \
+            "   \"DEPRULE\": \"${CC} -m\"," \
+            "   \"AR`\": \"${AR}\"," \
+            "   \"ARFLAGS\": \"${ARFLAGS}\"," \
+            "   \"ARRULE\": \"${ARRULE}\"," \
+            "   \"LD\": \"${LD}\"," \
+            "   \"LDFLAGS\": \"${LDFLAGS}\"," \
+            "   \"LDRULE\": \"${LDRULE}\"," \
+            "   \"PREBUILD\": \"${PREBUILD}\"," \
+            "   \"POSTBUILD\": \"${POSTBUILD}\"," \
+            "   \"archs\": [{" \
+            "       \"name\": \"i686\"," \
+            "       \"enabled\": null," \
+            "       \"PREFIX\": \"\"," \
+            "       \"AS\": \"${AS}\"," \
+            "       \"ASFLAGS\": \"${ASFLAGS}\"," \
+            "       \"CC\": \"${CC}\"," \
+            "       \"CFLAGS\": \"${CFLAGS}\"," \
+            "       \"CRULE\": \"${CRULLE}\"," \
+            "       \"CPP\": \"${CPP}\"," \
+            "       \"CPPFLAGS\": \"${CPPFLAGS}\"," \
+            "       \"CPPRULE\": \"${CPPRULE}\"," \
+            "       \"DEPRULE\": \"${CC} -m\"," \
+            "       \"AR`\": \"${AR}\"," \
+            "       \"ARFLAGS\": \"${ARFLAGS}\"," \
+            "       \"ARRULE\": \"${ARRULE}\"," \
+            "       \"LD\": \"${LD}\"," \
+            "       \"LDFLAGS\": \"${LDFLAGS}\"," \
+            "       \"LDRULE\": \"${LDRULE}\"," \
+            "       \"PREBUILD\": \"${PREBUILD}\"," \
+            "       \"POSTBUILD\": \"${POSTBUILD}\"," \
+            "       \"archs\": []" \
+            "   }]" \
             "}"
     archs = Architecture(cfg, verbose=True)

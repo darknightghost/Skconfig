@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 '''
       Copyright 2018,王思远 <darknightghost.cn@gmail.com>
       This program is free software: you can redistribute it and/or modify

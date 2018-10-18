@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 '''
       Copyright 2018,王思远 <darknightghost.cn@gmail.com>
       This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,7 @@
 
 import inspect
 
+
 def TypeChecker(*type_args, **type_kwargs):
     '''
         Check types of arguments.
@@ -25,6 +25,7 @@ def TypeChecker(*type_args, **type_kwargs):
         def func(arg0, arg1):
             ...
     '''
+
     def decorator(func):
         sig = inspect.signature(func)
 
@@ -40,7 +41,8 @@ def TypeChecker(*type_args, **type_kwargs):
             for name, value in bound_values.arguments.items():
                 if name in bound_types:
                     if not isinstance(value, bound_types[name]):
-                        raise TypeError('Argument {} must be {}'.format(name, bound_types[name]))
+                        raise TypeError('Argument {} must be {}'.format(
+                            name, bound_types[name]))
 
             return func(*args, **kwargs)
 
