@@ -15,7 +15,10 @@
 '''
 
 import inspect
+import functools
+import logging
 
+LOG_FORMAT_STR = "%(levelname)s : %(message)s"
 
 def TypeChecker(*type_args, **type_kwargs):
     '''
@@ -32,20 +35,50 @@ def TypeChecker(*type_args, **type_kwargs):
         #Get arguments types
         types = sig.bind_partial(*type_args, **type_kwargs).arguments
 
-        @wraps(func)
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             #Get arguments values
             values = sig.bind(*args, **kwargs)
 
             #Check types
-            for name, value in bound_values.arguments.items():
-                if name in bound_types:
-                    if not isinstance(value, bound_types[name]):
+            for name, value in values.arguments.items():
+                if name in types:
+                    if not isinstance(value,types[name]):
                         raise TypeError('Argument {} must be {}'.format(
-                            name, bound_types[name]))
+                            name, types[name]))
 
             return func(*args, **kwargs)
 
         return wrapper
 
     return decorator
+
+def get_value(s):
+    '''
+        Get variable string, return None if failed.
+
+        get_value(str) -> name, begin, end
+    '''
+    i = 0
+    begin, end = 0, 0
+    name = ""
+    #Search for variable
+    while i < len(s):
+        if s[i] == '$':
+            begin = i
+            i += 1
+            if s[i] == '{':
+                #Get value name and end
+                i += 1
+                try:
+                    while s[i] != '}':
+                        name += s[i]
+                        i += 1
+
+                    end = i
+                    return name, begin, end + 1
+                except IndexError:
+                    return None
+        
+        i += 1
+    return None
