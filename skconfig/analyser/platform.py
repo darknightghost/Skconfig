@@ -88,7 +88,7 @@ class Platform:
             self._name = "global"
 
         logging.info("Loading platform \"%s\"." % (self.name()))
-        self._debug("----------------------------------------------")
+        logging.debug("----------------------------------------------")
         self.__load_values(cfg)
         self.__load_children(cfg)
 
@@ -100,7 +100,7 @@ class Platform:
             try:
                 val = cfg[name]
                 self._values[name] = val
-                self._debug("%s = %s" % (name, val))
+                logging.debug("%s = %s" % (name, val))
 
             except KeyError:
                 raise KeyError("Missing attribute \"%s\"." % (name))
@@ -129,38 +129,8 @@ class Platform:
             self._enabled_child = list(self._children.keys())[0]
 
         if self._enabled_child != None:
-            self._info("Platform \"%s\" enabled." %
-                       (self._children[self._enabled_child].name()))
-
-    def _debug(self, msg, *args, **kwargs):
-        '''
-            Logs a message with level DEBUG on the logger.
-        '''
-        logging.debug(msg, *args, **kwargs)
-
-    def _info(self, msg, *args, **kwargs):
-        '''
-            Logs a message with level INFO on the logger.
-        '''
-        logging.info(msg, *args, **kwargs)
-
-    def _warning(self, msg, *args, **kwargs):
-        '''
-            Logs a message with level WARNING on the logger.
-        '''
-        logging.warning(msg, *args, **kwargs)
-
-    def _error(self, msg, *args, **kwargs):
-        '''
-            Logs a message with level ERROR on the logger.
-        '''
-        logging.errno(msg, *args, **kwargs)
-
-    def _critical(self, msg, *args, **kwargs):
-        '''
-            Logs a message with level CRITICAL on the logger.
-        '''
-        logging.critical(msg, *args, **kwargs)
+            logging.info("Platform \"%s\" enabled." %
+                         (self._children[self._enabled_child].name()))
 
     def name(self):
         '''
