@@ -20,6 +20,7 @@ import logging
 
 LOG_FORMAT_STR = "%(levelname)s : %(message)s"
 
+
 def TypeChecker(*type_args, **type_kwargs):
     '''
         Check types of arguments.
@@ -43,7 +44,7 @@ def TypeChecker(*type_args, **type_kwargs):
             #Check types
             for name, value in values.arguments.items():
                 if name in types:
-                    if not isinstance(value,types[name]):
+                    if not isinstance(value, types[name]):
                         raise TypeError('Argument {} must be {}'.format(
                             name, types[name]))
 
@@ -52,6 +53,7 @@ def TypeChecker(*type_args, **type_kwargs):
         return wrapper
 
     return decorator
+
 
 def get_value(s):
     '''
@@ -79,6 +81,6 @@ def get_value(s):
                     return name, begin, end + 1
                 except IndexError:
                     return None
-        
+
         i += 1
     return None

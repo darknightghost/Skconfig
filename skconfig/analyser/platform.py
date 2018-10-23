@@ -65,17 +65,17 @@ import logging
 import skconfig
 from skconfig import TypeChecker as TypeChecker
 
+
 class Platform:
     @TypeChecker(object, dict, object)
-    def __init__(self, cfg, parent = None):
+    def __init__(self, cfg, parent=None):
         #Load values
         if "_var_list" not in dir(self):
             self._var_list = []
 
         self._var_list += [
             "AS", "ASFLAGS", "ASRULE", "CC", "CFLAGS", "CRULE", "CPP",
-            "CPPFLAGS", "CPPRULE", "DEPRULE",
-            "AR", "ARFLAGS", "ARRULE", "LD",
+            "CPPFLAGS", "CPPRULE", "DEPRULE", "AR", "ARFLAGS", "ARRULE", "LD",
             "LDFLAGS", "LDRULE", "PREBUILD", "POSTBUILD"
         ]
 
@@ -103,7 +103,7 @@ class Platform:
                 self._debug("%s = %s" % (name, val))
 
             except KeyError:
-               raise KeyError("Missing attribute \"%s\"." % (name))
+                raise KeyError("Missing attribute \"%s\"." % (name))
 
     def __load_children(self, cfg):
         '''
@@ -129,8 +129,8 @@ class Platform:
             self._enabled_child = list(self._children.keys())[0]
 
         if self._enabled_child != None:
-            self._info("Platform \"%s\" enabled." % (
-                self._children[self._enabled_child].name()))
+            self._info("Platform \"%s\" enabled." %
+                       (self._children[self._enabled_child].name()))
 
     def _debug(self, msg, *args, **kwargs):
         '''
@@ -200,7 +200,7 @@ class Platform:
         return ret
 
     @TypeChecker(object, dict)
-    def gen_var(self, values = {}):
+    def gen_var(self, values={}):
         '''
             Generate makefile variables.
         '''
@@ -232,9 +232,10 @@ class Platform:
                         var_value = values[name]
 
                     except KeyError:
-                        raise AttributeError("Missing attribute \"%s\"." % (name))
-                    
-                val = val[: begin] + var_value + val[end :] 
+                        raise AttributeError(
+                            "Missing attribute \"%s\"." % (name))
+
+                val = val[:begin] + var_value + val[end:]
 
             val.replace("$$", "$")
             cur_values[val_name] = val
@@ -247,6 +248,7 @@ class Platform:
             #Generate child platform
             return self._children[self._enabled_child].gen_var(cur_values)
 
+
 class SubPlatform(Platform):
     @TypeChecker(object, dict, object)
     def __init__(self, cfg, parent):
@@ -257,6 +259,7 @@ class SubPlatform(Platform):
         self._var_list += ["PREFIX"]
 
         super().__init__(cfg, parent=parent)
+
 
 def test():
     import json
