@@ -17,13 +17,6 @@
 import skconfig
 from skconfig import TypeChecker as TypeChecker
 
-OPTION_TYPES = {
-    "menu": object,
-    "text": object,
-    "list": object,
-    "checkbox": object
-}
-
 
 class Option:
     def __init__(self, cfg):
@@ -51,6 +44,9 @@ class List(Option):
 class Checkbox(Option):
     def __init__(self, cfg):
         super().__init__(cfg)
+
+
+OPTION_TYPES = {"menu": Menu, "text": Text, "list": List, "checkbox": Checkbox}
 
 
 def test():
