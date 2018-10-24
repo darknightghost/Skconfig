@@ -19,10 +19,12 @@ import logging
 import skconfig
 import traceback
 import skconfig.analyser.platform
+import skconfig.analyser.option
 
 def test():
     skconfig.test()
-    skconfig.analyser.platform.test()
+    #skconfig.analyser.platform.test()
+    skconfig.analyser.option.test()
 
 logging.basicConfig(level=logging.DEBUG, format=skconfig.LOG_FORMAT_STR)
 

@@ -13,3 +13,45 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+
+import skconfig
+from skconfig import TypeChecker as TypeChecker
+
+OPTION_TYPES = {
+    "menu": object,
+    "text": object,
+    "list": object,
+    "checkbox": object
+}
+
+
+class Option:
+    def __init__(self, cfg):
+        pass
+
+    def __new__(cls, cfg):
+        return OPTION_TYPES[cfg["type"]](cfg)
+
+
+class Menu(Option):
+    def __init__(self, cfg):
+        super().__init__(cfg)
+
+
+class Text(Option):
+    def __init__(self, cfg):
+        super().__init__(cfg)
+
+
+class List(Option):
+    def __init__(self, cfg):
+        super().__init__(cfg)
+
+
+class Checkbox(Option):
+    def __init__(self, cfg):
+        super().__init__(cfg)
+
+
+def test():
+    pass

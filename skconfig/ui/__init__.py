@@ -13,3 +13,34 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+'''
+    Defination of ui object:
+    +==========+================================================+=============+
+    | Type     | Format                                         | Description |
+    +==========+================================================+=============+
+    | lable    | {"type" : "lable",                             | Static text.|
+    |          |    "title" : "title"}                          |             |
+    +----------+------------------------------------------------+-------------+
+    | menu     | {"type" : "menu",                              | Menu.       |
+    |          |    "title" : "title",                          |             |
+    |          |    "objects" : [obj1, obj2, obj3, ...]}        |             |
+    +----------+------------------------------------------------+-------------|
+    | text     | {"type" : "text",                              | Input box.  |
+    |          |    "title" : "title",                          |             |
+    |          |    "text" : "value",                           |             |
+    |          |    "onChange" : callback}                      |             |
+    +----------+------------------------------------------------+-------------+
+    | list     | {"type" : "list",                              | List to     |
+    |          |    "title" : "title",                          | select one  |
+    |          |    "options" : [                               | item.       |
+    |          |        "option1", "option2", "option3", ...],  |             |
+    |          |    "index" : 0,                                |             |
+    |          |    "onChange" : callback}                      |             |
+    +----------+------------------------------------------------+-------------+
+    | checkbox | {"type" : "checkbox",                          | Checkbox.   |
+    |          |    "title" : "title",                          |             |
+    |          |    "value" : True,                             |             |
+    |          |    "onChange" : callback}                      |             |
+    +----------+------------------------------------------------+-------------+
+
+'''

@@ -218,6 +218,15 @@ class Platform:
             #Generate child platform
             return self._children[self._enabled_child].gen_var(cur_values)
 
+    def __getiten__(self, key):
+        return self._values[key]
+
+    def __setitem__(self, key, value):
+        if key not in self._values.keys():
+            raise KeyError("Unknow variable \"%s\"." % (key))
+
+        self._values[key] = value
+
 
 class SubPlatform(Platform):
     @TypeChecker(object, dict, object)
