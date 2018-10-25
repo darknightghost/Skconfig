@@ -13,53 +13,6 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-'''
-    {
-            "enabled": "i686",
-            "AS": "${AS}",
-            "ASFLAGS": "${ASFLAGS}",
-            "ASRULE": "${ASRULE}",
-            "CC": "${CC}",
-            "CFLAGS": "${CFLAGS}",
-            "CRULE": "${CRULE}",
-            "CPP": "${CPP}",
-            "CPPFLAGS": "${CPPFLAGS}",
-            "CPPRULE": "${CPPRULE}",
-            "DEPRULE": "${CC} -m",
-            "AR": "${AR}",
-            "ARFLAGS": "${ARFLAGS}",
-            "ARRULE": "${ARRULE}",
-            "LD": "${LD}",
-            "LDFLAGS": "${LDFLAGS}",
-            "LDRULE": "${LDRULE}",
-            "PREBUILD": "${PREBUILD}",
-            "POSTBUILD": "${POSTBUILD}",
-            "platforms": [{
-                    "name": "i686",
-                    "enabled": null,
-                    "PREFIX": "",
-                    "AS": "${AS}",
-                    "ASFLAGS": "${ASFLAGS}",
-                    "ASRULE": "${ASRULE}",
-                    "CC": "${CC}",
-                    "CFLAGS": "${CFLAGS}",
-                    "CRULE": "${CRULE}",
-                    "CPP": "${CPP}",
-                    "CPPFLAGS": "${CPPFLAGS}",
-                    "CPPRULE": "${CPPRULE}",
-                    "DEPRULE": "${CC} -m",
-                    "AR": "${AR}",
-                    "ARFLAGS": "${ARFLAGS}",
-                    "ARRULE": "${ARRULE}",
-                    "LD": "${LD}",
-                    "LDFLAGS": "${LDFLAGS}",
-                    "LDRULE": "${LDRULE}",
-                    "PREBUILD": "${PREBUILD}",
-                    "POSTBUILD": "${POSTBUILD}",
-                    "platforms": []
-            }]
-}
-'''
 
 import logging
 import skconfig
@@ -67,6 +20,57 @@ from skconfig import TypeChecker as TypeChecker
 
 
 class Platform:
+    '''
+        Compile platform.
+
+        Json format:
+        {
+                "enabled": "i686",
+                "AS": "${AS}",
+                "ASFLAGS": "${ASFLAGS}",
+                "ASRULE": "${ASRULE}",
+                "CC": "${CC}",
+                "CFLAGS": "${CFLAGS}",
+                "CRULE": "${CRULE}",
+                "CPP": "${CPP}",
+                "CPPFLAGS": "${CPPFLAGS}",
+                "CPPRULE": "${CPPRULE}",
+                "DEPRULE": "${CC} -m",
+                "AR": "${AR}",
+                "ARFLAGS": "${ARFLAGS}",
+                "ARRULE": "${ARRULE}",
+                "LD": "${LD}",
+                "LDFLAGS": "${LDFLAGS}",
+                "LDRULE": "${LDRULE}",
+                "PREBUILD": "${PREBUILD}",
+                "POSTBUILD": "${POSTBUILD}",
+                "platforms": [{
+                        "name": "i686",
+                        "enabled": null,
+                        "PREFIX": "",
+                        "AS": "${AS}",
+                        "ASFLAGS": "${ASFLAGS}",
+                        "ASRULE": "${ASRULE}",
+                        "CC": "${CC}",
+                        "CFLAGS": "${CFLAGS}",
+                        "CRULE": "${CRULE}",
+                        "CPP": "${CPP}",
+                        "CPPFLAGS": "${CPPFLAGS}",
+                        "CPPRULE": "${CPPRULE}",
+                        "DEPRULE": "${CC} -m",
+                        "AR": "${AR}",
+                        "ARFLAGS": "${ARFLAGS}",
+                        "ARRULE": "${ARRULE}",
+                        "LD": "${LD}",
+                        "LDFLAGS": "${LDFLAGS}",
+                        "LDRULE": "${LDRULE}",
+                        "PREBUILD": "${PREBUILD}",
+                        "POSTBUILD": "${POSTBUILD}",
+                        "platforms": []
+                }]
+    }
+    '''
+
     @TypeChecker(object, dict, object)
     def __init__(self, cfg, parent=None):
         #Load values

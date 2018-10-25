@@ -19,29 +19,113 @@ from skconfig import TypeChecker as TypeChecker
 
 
 class Option:
+    @TypeChecker(object, dict)
     def __init__(self, cfg):
         pass
 
     def __new__(cls, cfg):
         return OPTION_TYPES[cfg["type"]](cfg)
 
+    def gen_ui(self):
+        pass
+
+
+class OptionVariables:
+    '''
+        Variable list influlenctd by the option.
+
+        Json format:
+        {
+            "variable1" : "value1",
+            "variable2" : "value2",
+            "variable3" : "value3",
+            ...
+        }
+    '''
+
+    @TypeChecker(object, dict)
+    def __init__(self, cfg):
+        pass
+
 
 class Menu(Option):
+    '''
+        Menu.
+
+        Json format:
+        {
+            "type" : "menu",
+            "title" : "menu-name",
+            "options" : [
+                Option,
+                Option,
+                Option,
+                ...
+            ]
+        }
+    '''
+
+    @TypeChecker(object, dict)
     def __init__(self, cfg):
         super().__init__(cfg)
 
 
 class Text(Option):
+    '''
+        Edit box.
+
+        Use ${VALUE} to get the value of the option in OptionVariables.
+        Json format:
+        {
+            "type" : "text",
+            "title" : "option-name",
+            "value" : "value-of-option",
+            "variables" : OptionVariables,
+        }
+    '''
+
+    @TypeChecker(object, dict)
     def __init__(self, cfg):
         super().__init__(cfg)
 
 
 class List(Option):
+    '''
+        List.
+
+        Json format:
+        {
+            "type" : "list",
+            "title" : "option-name",
+            "selected" : 0,                 #Index
+            "choices" : [
+                {"name" : "name1", "variables" : OptionVariables},
+                {"name" : "name2", "variables" : OptionVariables},
+                {"name" : "name3", "variables" : OptionVariables},
+                ...
+            ]
+        }
+    '''
+
+    @TypeChecker(object, dict)
     def __init__(self, cfg):
         super().__init__(cfg)
 
 
 class Checkbox(Option):
+    '''
+        Checkbox.
+
+        Json format:
+        {
+            "type" : "checkbox",
+            "title" : "option-name",
+            "value" : true,                 #True if checked.
+            "variables" : OptionVariables
+        }
+    '''
+
+    @TypeChecker(object, dict)
     def __init__(self, cfg):
         super().__init__(cfg)
 
