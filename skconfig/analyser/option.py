@@ -205,6 +205,44 @@ class Text(Option):
     @TypeChecker(object, dict)
     def __init__(self, desc):
         super().__init__(desc)
+        self._value = desc["value"]
+        self._variables = OptionVariables(desc["variables"])
+
+    def gen_ui(self):
+        '''
+            Generate ui info.
+        '''
+
+        def on_value_change(val):
+            self._value = val
+
+        return {
+            "type": "text",
+            "title": self._title,
+            "text": self._value,
+            "onChange": on_value_change
+        }
+
+    @TypeChecker(object, dict)
+    def gen_var(self, values={}):
+        '''
+            Generate makefile variables.
+        '''
+        ret = self._variables.gen_var(values, self._value)
+        return ret
+
+    def gen_cfg(self):
+        '''
+            Generate config.
+        '''
+        return {"value": self._value}
+
+    @TypeChecker(object, dict)
+    def load_cfg(self, cfg):
+        '''
+            Load config.
+        '''
+        self._value = cfg["value"]
 
 
 class List(Option):
