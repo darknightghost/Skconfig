@@ -72,7 +72,7 @@ class Platform:
     '''
 
     @TypeChecker(object, dict, object)
-    def __init__(self, cfg, parent=None):
+    def __init__(self, desc, parent=None):
         #Load values
         if "_var_list" not in dir(self):
             self._var_list = []
@@ -82,7 +82,6 @@ class Platform:
             "CPPFLAGS", "CPPRULE", "DEPRULE", "AR", "ARFLAGS", "ARRULE", "LD",
             "LDFLAGS", "LDRULE", "PREBUILD", "POSTBUILD"
         ]
-
         self._parent = parent
 
         if "_values" not in dir(self):
@@ -93,30 +92,30 @@ class Platform:
 
         logging.info("Loading platform \"%s\"." % (self.name()))
         logging.debug("----------------------------------------------")
-        self.__load_values(cfg)
-        self.__load_children(cfg)
+        self.__load_values(desc)
+        self.__load_children(desc)
 
-    def __load_values(self, cfg):
+    def __load_values(self, desc):
         '''
             Load values from json file.
         '''
         for name in self._var_list:
             try:
-                val = cfg[name]
+                val = desc[name]
                 self._values[name] = val
                 logging.debug("%s = %s" % (name, val))
 
             except KeyError:
                 raise KeyError("Missing attribute \"%s\"." % (name))
 
-    def __load_children(self, cfg):
+    def __load_children(self, desc):
         '''
             Load child platforms from json file.
         '''
         self._children = {}
-        self._enabled_child = cfg["enabled"]
+        self._enabled_child = desc["enabled"]
         try:
-            plat_list = cfg["platforms"]
+            plat_list = desc["platforms"]
 
         except KeyError:
             self._enabled_child = None
@@ -148,9 +147,9 @@ class Platform:
         else:
             return self._name
 
-    def gen_config(self):
+    def gen_desc(self):
         '''
-            Generate json dictiony.
+            Generate json dictionary.
         '''
         ret = {}
 
@@ -167,7 +166,7 @@ class Platform:
         if len(self._children) > 0:
             platforms = []
             for c in self._children.keys():
-                platforms.append(self._children[c].gen_config())
+                platforms.append(self._children[c].gen_desc())
 
             ret["platforms"] = platforms
 
@@ -178,7 +177,7 @@ class Platform:
         '''
             Generate makefile variables.
         '''
-        cur_values = {}
+        cur_values = dict(values)
 
         #Generate values
         for val_name in self._var_list:
@@ -188,7 +187,7 @@ class Platform:
                 val = self._values[val_name]
 
             except KeyError:
-                pass
+                continue
 
             #Replace variables
             while True:
@@ -231,23 +230,60 @@ class Platform:
 
         self._values[key] = value
 
+    def gen_cfg(self):
+        '''
+            Generate config.
+        '''
+        ret = {}
+        for name in self._var_list:
+            ret[name] = self._values[name]
+
+        if self._enabled_child != None:
+            ret["enabledChild"] = self._enabled_child
+
+            children = {}
+            for name in self._children.keys():
+                children[name] = self._children[name].gen_cfg()
+            ret["children"] = children
+
+        return ret
+
+    @TypeChecker(object, dict)
+    def load_cfg(self, cfg):
+        '''
+            Load config.
+        '''
+        for name in cfg.keys():
+            if name == "enabledChild":
+                self._enabled_child = cfg[name]
+
+            elif name == "children":
+                for child in cfg[name].keys():
+                    self._children[child].load_cfg(cfg[name][child])
+
+            else:
+                if name not in self._var_list:
+                    raise AttributeError("Unknow variable \"%s\"." % (name))
+
+                self._values[name] = cfg[name]
+
 
 class SubPlatform(Platform):
     @TypeChecker(object, dict, object)
-    def __init__(self, cfg, parent):
+    def __init__(self, desc, parent):
         if "_var_list" not in dir(self):
             self._var_list = []
 
-        self._name = cfg["name"]
+        self._name = desc["name"]
         self._var_list += ["PREFIX"]
 
-        super().__init__(cfg, parent=parent)
+        super().__init__(desc, parent=parent)
 
 
 def test():
     import json
 
-    test_cfg = "{" \
+    test_desc = "{" \
             "   \"enabled\": \"i686\"," \
             "   \"AS\": \"gcc\"," \
             "   \"ASFLAGS\": \"-S\"," \
@@ -292,8 +328,12 @@ def test():
             "   }]" \
             "}"
     logging.debug("Testing platforms...")
-    archs = Platform(json.loads(test_cfg))
+    archs = Platform(json.loads(test_desc))
+    logging.debug("Generating description...")
+    logging.debug(archs.gen_desc())
     logging.debug("Generating config...")
-    logging.debug(archs.gen_config())
+    cfg = archs.gen_cfg()
+    logging.debug(cfg)
+    archs.load_cfg(cfg)
     logging.debug("Generating makefile variables...")
     logging.debug(str(archs.gen_var()))

@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 '''
       Copyright 2018,王思远 <darknightghost.cn@gmail.com>
       This program is free software: you can redistribute it and/or modify
@@ -21,10 +20,12 @@ import traceback
 import skconfig.analyser.platform
 import skconfig.analyser.option
 
+
 def test():
     skconfig.test()
-    #skconfig.analyser.platform.test()
+    skconfig.analyser.platform.test()
     skconfig.analyser.option.test()
+
 
 logging.basicConfig(level=logging.DEBUG, format=skconfig.LOG_FORMAT_STR)
 
@@ -33,5 +34,5 @@ try:
 
 except Exception as e:
     logging.error(str(e))
-    logging.debug(traceback.format_exc())
+    logging.error(traceback.format_exc())
     exit(-1)
