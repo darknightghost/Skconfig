@@ -154,7 +154,13 @@ class Menu(Option):
 
         #Append options
         for o in self._options:
-            ret["objects"].append(o.gen_ui)
+            ui = o.gen_ui()
+
+            if "keys" in dir(ui):
+                ret["objects"].append(ui)
+
+            else:
+                ret["objects"] += ui
 
         return ret
 
@@ -213,7 +219,8 @@ class Text(Option):
             Generate ui info.
         '''
 
-        def on_value_change(val):
+        @TypeChecker(str)
+        def on_change(val):
             self._value = val
 
         return {
@@ -255,7 +262,9 @@ class List(Option):
             "title" : "option-name",
             "selected" : 0,                 #Index
             "choices" : [
-                {"name" : "name1", "variables" : OptionVariables, "menu" : Menu},
+                {"name" : "name1",
+                    "variables" : OptionVariables, 
+                    "menu" : Menu},                     #Menu is optional
                 {"name" : "name2", "variables" : OptionVariables, "menu" : Menu},
                 {"name" : "name3", "variables" : OptionVariables, "menu" : Menu},
                 ...
@@ -266,6 +275,93 @@ class List(Option):
     @TypeChecker(object, dict)
     def __init__(self, desc):
         super().__init__(desc)
+        self._setected = desc["selected"]
+
+        #Load choices
+        self._choices = []
+        for c in desc.choices:
+            choice = {
+                "name": c["name"],
+                "variables": OptionVariables(c["variables"])
+            }
+            try:
+                choice["menu"] = Menu(c["menu"])
+
+            except KeyError:
+                pass
+
+            self._choices.append(choice)
+
+    def gen_ui(self):
+        '''
+            Generate ui info.
+        '''
+        #List
+        @TypeChecker(int)
+        def on_change(val):
+            self._setected = val
+
+        ret = [{
+            "type": "list",
+            "title": self._title,
+            "options": [],
+            "index": self._setected,
+            "onChange": on_change
+        }]
+
+        for c in self._choices:
+            ret[0]["options"].append(c["name"])
+
+        #Menu
+        try:
+            ret.append(self._choices[self._setected]["menu"])
+
+        except KeyError:
+            pass
+
+        return ret
+
+    @TypeChecker(object, dict)
+    def gen_var(self, values={}):
+        '''
+            Generate makefile variables.
+        '''
+        choosed = self._choices[self._setected]
+        ret = choosed["variables"].gen_var(values)
+        try:
+            ret = choosed["menu"].gen_var(values)
+
+        except KeyError:
+            pass
+
+        return ret
+
+    def gen_cfg(self):
+        '''
+            Generate config.
+        '''
+        ret = {"selected": self._setected, "choices": []}
+        for c in self._choices:
+            try:
+                ret["choices"].append(c["menu"].gen_cfg())
+
+            except KeyError:
+                ret["choices"].append(None)
+
+        return ret
+
+    @TypeChecker(object, dict)
+    def load_cfg(self, cfg):
+        '''
+            Load config.
+        '''
+        self._setected = cfg["selected"]
+        for i in range(0, len(self._choices)):
+            try:
+                self._choices[i]["menu"].load_cfg(cfg["choices"][i])
+
+            except KeyError:
+                pass
 
 
 class Checkbox(Option):
@@ -285,6 +381,77 @@ class Checkbox(Option):
     @TypeChecker(object, dict)
     def __init__(self, desc):
         super().__init__(desc)
+        self._value = desc["value"]
+        self._variables = OptionVariables(desc["variables"])
+        try:
+            self._menu = Menu(desc["menu"])
+
+        except KeyError:
+            pass
+
+    def gen_ui(self):
+        '''
+            Generate ui info.
+        '''
+
+        @TypeChecker(bool)
+        #Checkbox
+        def on_change(val):
+            self._value = val
+
+        ret = [{
+            "type": "checkbox",
+            "title": self._title,
+            "value": self._value,
+            "onChange": on_change
+        }]
+
+        #Menu
+        if self._value:
+            try:
+                ret.append(self._menu.gen_ui())
+
+            except AttributeError:
+                pass
+
+        return ret
+
+    @TypeChecker(object, dict)
+    def gen_var(self, values={}):
+        '''
+            Generate makefile variables.
+        '''
+        if self._value:
+            return self._variables.gen_var(values)
+
+        else:
+            return dict(values)
+
+    def gen_cfg(self):
+        '''
+            Generate config.
+        '''
+        ret = {"value": self._value}
+
+        try:
+            ret["menu"] = self._menu.gen_cfg()
+
+        except AttributeError:
+            pass
+
+        return ret
+
+    @TypeChecker(object, dict)
+    def load_cfg(self, cfg):
+        '''
+            Load config.
+        '''
+        self._value = cfg["value"]
+        try:
+            self._menu.load_cfg(cfg["menu"])
+
+        except AttributeError:
+            pass
 
 
 OPTION_TYPES = {"menu": Menu, "text": Text, "list": List, "checkbox": Checkbox}
