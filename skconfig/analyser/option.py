@@ -374,7 +374,7 @@ class Checkbox(Option):
             "title" : "option-name",
             "value" : true,                 #True if checked.
             "variables" : OptionVariables,
-            "menu" " Menu
+            "menu" : " Menu
         }
     '''
 

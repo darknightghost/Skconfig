@@ -69,6 +69,17 @@ class Platform:
                         "platforms": []
                 }]
     }
+
+        Config format :
+        {
+            "name1" : "value1",
+            "name2" : "value2",
+            "name3" : "value3",
+            ...
+            "nameN" : "valueN",
+            "enabledChild" : "name of enabled child",
+            "children" : [child1, child2, child3, ...]
+        }
     '''
 
     @TypeChecker(object, dict, object)

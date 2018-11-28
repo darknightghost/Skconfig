@@ -13,3 +13,52 @@
       You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+import skconfig
+from skconfig import TypeChecker as TypeChecker
+import logging
+
+
+class Target:
+    '''
+        Buildable target.
+
+        Json format:
+
+        Config file format:
+    '''
+
+    @TypeChecker(object, dict)
+    def __init__(self, desc):
+        self._type = desc["type"]
+        self._title = desc["title"]
+        logging.debug("Loading option, type=\"%s\", title=\"%s\"", self._type,
+                      self._title)
+
+    def __new__(cls, desc):
+        return OPTION_TYPES[desc["type"]](desc)
+
+    def gen_ui(self):
+        '''
+            Generate ui info.
+        '''
+        raise NotImplementedError()
+
+    @TypeChecker(object, dict)
+    def gen_var(self, values={}):
+        '''
+            Generate makefile variables.
+        '''
+        raise NotImplementedError()
+
+    def gen_cfg(self):
+        '''
+            Generate config.
+        '''
+        raise NotImplementedError()
+
+    @TypeChecker(object, dict)
+    def load_cfg(self, cfg):
+        '''
+            Load config.
+        '''
+        raise NotImplementedError()
