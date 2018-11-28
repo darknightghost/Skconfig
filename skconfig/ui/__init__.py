@@ -42,5 +42,6 @@
     |          |    "value" : True,                             |             |
     |          |    "onChange" : callback}                      |             |
     +----------+------------------------------------------------+-------------+
+    * Defination of Callback: def onChange(value):
 
 '''

@@ -241,6 +241,83 @@ class Platform:
 
         self._values[key] = value
 
+    def gen_ui(self):
+        '''
+            Generate ui.
+        '''
+
+        class UIVarCallback:
+            '''
+                Text callback function.
+            '''
+
+            @TypeChecker(object, str, object)
+            def __init__(self, key_name, plat):
+                self.__key_name = key_name
+                self.__plat = plat
+
+            @TypeChecker(self, str)
+            def __call__(self, val):
+                self.__plat[self.__key_name] = val
+
+        class UIChildCallback:
+            '''
+                List callback function.
+            '''
+
+            @TypeChecker(object, object, list)
+            def __init__(self, plat, names):
+                self.__plat = plat
+                self.__names = names.copy()
+
+            @TypeChecker(self, int)
+            def __call__(self, val):
+                self.__plat._enabled_child = self.__names[val]
+
+            #Variables
+            options = []
+            for var in self._var_list:
+                options.append({
+                    "type": "text",
+                    "title": var,
+                    "text": self[var],
+                    "onChange": UIVarCallback(var, self)
+                })
+
+            #Children
+            if self._enabled_child != None:
+                #Enabled child
+                child_names = list(self._children.keys()).copy()
+                options.append({
+                    "type":
+                    "list",
+                    "title":
+                    "Enabled child",
+                    "options":
+                    child_names,
+                    "index":
+                    child_names.index(self._enabled_child),
+                    "onChange":
+                    UIChildCallback(self, child_names)
+                })
+
+                #Children
+                child_menus = []
+                for c in self._children.keys():
+                    child_menus.append(self._children[c].gen_ui())
+
+                options.append({
+                    "type": "menu",
+                    "title": "Child platform options",
+                    "objects": child_menus
+                })
+
+            return {
+                "type": "menu",
+                "title": "Platform \"%s\" options" % (self.name()),
+                "objects": options
+            }
+
     def gen_cfg(self):
         '''
             Generate config.

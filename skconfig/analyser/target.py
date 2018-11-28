@@ -23,13 +23,34 @@ class Target:
         Buildable target.
 
         Json format:
+        {
+            "name" : "target name",
+            "dependencies" : [
+                "path of target file 1",
+                "path of target file 2",
+                "path of target file 3",
+                ... ,
+                "path of target file n"
+            ],
+            "platform" : Platform,
+            "options" : [
+                option1,
+                option2,
+                option3,
+                ...,
+                optionN
+            ]
+        }
 
         Config file format:
+        {
+            "platform" : platform-config,
+            "options" : options-config
+        }
     '''
 
     @TypeChecker(object, dict)
     def __init__(self, desc):
-        self._type = desc["type"]
         self._title = desc["title"]
         logging.debug("Loading option, type=\"%s\", title=\"%s\"", self._type,
                       self._title)
