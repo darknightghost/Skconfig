@@ -14,7 +14,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import re
+import pathlib
 
-class Buildable:
-    def __init__(self, properties):
-        pass
+
+def scan_file(path, pattern, regexp=None):
+    '''
+        Search files.
+    '''
+    if regexp == None:
+        #Compile expression
+        regexp = re.compile(path)
+
+    #Search files
+    begin_dir = pathlib.Path(path).absolute()
+    ret = []
+    for p in begin_dir.glob("*"):
+        if p.name not in (".", ".."):
+            if p.is_dir():
+                ret += scan_file(str(p.absolute()), "", regexp)
+
+            elif regexp.fullmatch(p.name):
+                ret.append((str(p)))
+    return ret

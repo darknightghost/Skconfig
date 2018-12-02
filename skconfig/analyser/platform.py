@@ -148,7 +148,7 @@ class Platform:
 
     def name(self):
         '''
-            Get name opf the platform.
+            Get name of the platform.
         '''
         parent_name = ""
         if self._parent != None:
@@ -274,49 +274,44 @@ class Platform:
             def __call__(self, val):
                 self.__plat._enabled_child = self.__names[val]
 
-            #Variables
-            options = []
-            for var in self._var_list:
-                options.append({
-                    "type": "text",
-                    "title": var,
-                    "text": self[var],
-                    "onChange": UIVarCallback(var, self)
-                })
+        #Variables
+        options = []
+        for var in self._var_list:
+            options.append({
+                "type": "text",
+                "title": var,
+                "text": self[var],
+                "onChange": UIVarCallback(var, self)
+            })
+
+        #Children
+        if self._enabled_child != None:
+            #Enabled child
+            child_names = list(self._children.keys()).copy()
+            options.append({
+                "type": "list",
+                "title": "Enabled child",
+                "options": child_names,
+                "index": child_names.index(self._enabled_child),
+                "onChange": UIChildCallback(self, child_names)
+            })
 
             #Children
-            if self._enabled_child != None:
-                #Enabled child
-                child_names = list(self._children.keys()).copy()
-                options.append({
-                    "type":
-                    "list",
-                    "title":
-                    "Enabled child",
-                    "options":
-                    child_names,
-                    "index":
-                    child_names.index(self._enabled_child),
-                    "onChange":
-                    UIChildCallback(self, child_names)
-                })
+            child_menus = []
+            for c in self._children.keys():
+                child_menus.append(self._children[c].gen_ui())
 
-                #Children
-                child_menus = []
-                for c in self._children.keys():
-                    child_menus.append(self._children[c].gen_ui())
-
-                options.append({
-                    "type": "menu",
-                    "title": "Child platform options",
-                    "objects": child_menus
-                })
-
-            return {
+            options.append({
                 "type": "menu",
-                "title": "Platform \"%s\" options" % (self.name()),
-                "objects": options
-            }
+                "title": "Child platform options",
+                "objects": child_menus
+            })
+
+        return {
+            "type": "menu",
+            "title": "Platform \"%s\" options" % (self.name()),
+            "objects": options
+        }
 
     def gen_cfg(self):
         '''

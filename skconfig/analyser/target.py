@@ -16,13 +16,14 @@
 import skconfig
 from skconfig import TypeChecker as TypeChecker
 import logging
+import json
 
 
 class Target:
     '''
         Buildable target.
 
-        Json format:
+        .target Json format:
         {
             "name" : "target name",
             "dependencies" : [
@@ -32,7 +33,6 @@ class Target:
                 ... ,
                 "path of target file n"
             ],
-            "platform" : Platform,
             "options" : [
                 option1,
                 option2,
@@ -42,21 +42,46 @@ class Target:
             ]
         }
 
-        Config file format:
+        .module json format:
+        {
+            "options" : [
+            option1,
+            option2,
+            option3,
+            ...,
+            optionN
+            ]
+        }
+
+        Target config file format:
         {
             "platform" : platform-config,
             "options" : options-config
         }
+        
+        Module config file format:
+        {
+            "options" : options-confg
+        }
     '''
 
-    @TypeChecker(object, dict)
-    def __init__(self, desc):
-        self._title = desc["title"]
-        logging.debug("Loading option, type=\"%s\", title=\"%s\"", self._type,
-                      self._title)
+    @TypeChecker(object, str)
+    def __init__(self, path):
+        logging.debug("Loading target, path=\"%s\"", path)
+        self.__name = desc["name"]
 
-    def __new__(cls, desc):
-        return OPTION_TYPES[desc["type"]](desc)
+    def __load_target(self, path):
+        #Search modules
+        pass
+
+    def __load_module(self, path):
+        pass
+
+    def name(self):
+        '''
+            Get name of target.
+        '''
+        return self.__name
 
     def gen_ui(self):
         '''
@@ -78,7 +103,7 @@ class Target:
         raise NotImplementedError()
 
     @TypeChecker(object, dict)
-    def load_cfg(self, cfg):
+    def _load_cfg(self, cfg):
         '''
             Load config.
         '''
