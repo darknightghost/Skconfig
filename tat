@@ -1,0 +1,274 @@
+Help on PosixPath in module pathlib object:
+
+class PPoossiixxPPaatthh(Path, PurePosixPath)
+ |  PosixPath(*args, **kwargs)
+ |  
+ |  Path subclass for non-Windows systems.
+ |  
+ |  On a POSIX system, instantiating a Path should return this object.
+ |  
+ |  Method resolution order:
+ |      PosixPath
+ |      Path
+ |      PurePosixPath
+ |      PurePath
+ |      builtins.object
+ |  
+ |  Methods inherited from Path:
+ |  
+ |  ____eenntteerr____(self)
+ |  
+ |  ____eexxiitt____(self, t, v, tb)
+ |  
+ |  aabbssoolluuttee(self)
+ |      Return an absolute version of this path.  This function works
+ |      even if the path doesn't point to anything.
+ |      
+ |      No normalization is done, i.e. all '.' and '..' will be kept along.
+ |      Use resolve() to get the canonical path to a file.
+ |  
+ |  cchhmmoodd(self, mode)
+ |      Change the permissions of the path, like os.chmod().
+ |  
+ |  eexxiissttss(self)
+ |      Whether this path exists.
+ |  
+ |  eexxppaanndduusseerr(self)
+ |      Return a new path with expanded ~ and ~user constructs
+ |      (as returned by os.path.expanduser)
+ |  
+ |  gglloobb(self, pattern)
+ |      Iterate over this subtree and yield all existing files (of any
+ |      kind, including directories) matching the given pattern.
+ |  
+ |  ggrroouupp(self)
+ |      Return the group name of the file gid.
+ |  
+ |  iiss__bblloocckk__ddeevviiccee(self)
+ |      Whether this path is a block device.
+ |  
+ |  iiss__cchhaarr__ddeevviiccee(self)
+ |      Whether this path is a character device.
+ |  
+ |  iiss__ddiirr(self)
+ |      Whether this path is a directory.
+ |  
+ |  iiss__ffiiffoo(self)
+ |      Whether this path is a FIFO.
+ |  
+ |  iiss__ffiillee(self)
+ |      Whether this path is a regular file (also True for symlinks pointing
+ |      to regular files).
+ |  
+ |  iiss__mmoouunntt(self)
+ |      Check if this path is a POSIX mount point
+ |  
+ |  iiss__ssoocckkeett(self)
+ |      Whether this path is a socket.
+ |  
+ |  iiss__ssyymmlliinnkk(self)
+ |      Whether this path is a symbolic link.
+ |  
+ |  iitteerrddiirr(self)
+ |      Iterate over the files in this directory.  Does not yield any
+ |      result for the special paths '.' and '..'.
+ |  
+ |  llcchhmmoodd(self, mode)
+ |      Like chmod(), except if the path points to a symlink, the symlink's
+ |      permissions are changed, rather than its target's.
+ |  
+ |  llssttaatt(self)
+ |      Like stat(), except if the path points to a symlink, the symlink's
+ |      status information is returned, rather than its target's.
+ |  
+ |  mmkkddiirr(self, mode=511, parents=False, exist_ok=False)
+ |      Create a new directory at this given path.
+ |  
+ |  ooppeenn(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None)
+ |      Open the file pointed by this path and return a file object, as
+ |      the built-in open() function does.
+ |  
+ |  oowwnneerr(self)
+ |      Return the login name of the file owner.
+ |  
+ |  rreeaadd__bbyytteess(self)
+ |      Open the file in bytes mode, read it, and close the file.
+ |  
+ |  rreeaadd__tteexxtt(self, encoding=None, errors=None)
+ |      Open the file in text mode, read it, and close the file.
+ |  
+ |  rreennaammee(self, target)
+ |      Rename this path to the given path.
+ |  
+ |  rreeppllaaccee(self, target)
+ |      Rename this path to the given path, clobbering the existing
+ |      destination if it exists.
+ |  
+ |  rreessoollvvee(self, strict=False)
+ |      Make the path absolute, resolving all symlinks on the way and also
+ |      normalizing it (for example turning slashes into backslashes under
+ |      Windows).
+ |  
+ |  rrgglloobb(self, pattern)
+ |      Recursively yield all existing files (of any kind, including
+ |      directories) matching the given pattern, anywhere in this subtree.
+ |  
+ |  rrmmddiirr(self)
+ |      Remove this directory.  The directory must be empty.
+ |  
+ |  ssaammeeffiillee(self, other_path)
+ |      Return whether other_path is the same or not as this file
+ |      (as returned by os.path.samefile()).
+ |  
+ |  ssttaatt(self)
+ |      Return the result of the stat() system call on this path, like
+ |      os.stat() does.
+ |  
+ |  ssyymmlliinnkk__ttoo(self, target, target_is_directory=False)
+ |      Make this path a symlink pointing to the given path.
+ |      Note the order of arguments (self, target) is the reverse of os.symlink's.
+ |  
+ |  ttoouucchh(self, mode=438, exist_ok=True)
+ |      Create this file with the given access mode, if it doesn't exist.
+ |  
+ |  uunnlliinnkk(self)
+ |      Remove this file or link.
+ |      If the path is a directory, use rmdir() instead.
+ |  
+ |  wwrriittee__bbyytteess(self, data)
+ |      Open the file in bytes mode, write to it, and close the file.
+ |  
+ |  wwrriittee__tteexxtt(self, data, encoding=None, errors=None)
+ |      Open the file in text mode, write to it, and close the file.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Class methods inherited from Path:
+ |  
+ |  ccwwdd() from builtins.type
+ |      Return a new path pointing to the current working directory
+ |      (as returned by os.getcwd()).
+ |  
+ |  hhoommee() from builtins.type
+ |      Return a new path pointing to the user's home directory (as
+ |      returned by os.path.expanduser('~')).
+ |  
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from Path:
+ |  
+ |  ____nneeww____(cls, *args, **kwargs)
+ |      Construct a PurePath from one or several strings and or existing
+ |      PurePath objects.  The strings and path objects are combined so as
+ |      to yield a canonicalized path, which is incorporated into the
+ |      new PurePath object.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from PurePath:
+ |  
+ |  ____bbyytteess____(self)
+ |      Return the bytes representation of the path.  This is only
+ |      recommended to use under Unix.
+ |  
+ |  ____eeqq____(self, other)
+ |      Return self==value.
+ |  
+ |  ____ffssppaatthh____(self)
+ |  
+ |  ____ggee____(self, other)
+ |      Return self>=value.
+ |  
+ |  ____ggtt____(self, other)
+ |      Return self>value.
+ |  
+ |  ____hhaasshh____(self)
+ |      Return hash(self).
+ |  
+ |  ____llee____(self, other)
+ |      Return self<=value.
+ |  
+ |  ____lltt____(self, other)
+ |      Return self<value.
+ |  
+ |  ____rreedduuccee____(self)
+ |      Helper for pickle.
+ |  
+ |  ____rreepprr____(self)
+ |      Return repr(self).
+ |  
+ |  ____rrttrruueeddiivv____(self, key)
+ |  
+ |  ____ssttrr____(self)
+ |      Return the string representation of the path, suitable for
+ |      passing to system calls.
+ |  
+ |  ____ttrruueeddiivv____(self, key)
+ |  
+ |  aass__ppoossiixx(self)
+ |      Return the string representation of the path with forward (/)
+ |      slashes.
+ |  
+ |  aass__uurrii(self)
+ |      Return the path as a 'file' URI.
+ |  
+ |  iiss__aabbssoolluuttee(self)
+ |      True if the path is absolute (has both a root and, if applicable,
+ |      a drive).
+ |  
+ |  iiss__rreesseerrvveedd(self)
+ |      Return True if the path contains one of the special names reserved
+ |      by the system, if any.
+ |  
+ |  jjooiinnppaatthh(self, *args)
+ |      Combine this path with one or several arguments, and return a
+ |      new path representing either a subpath (if all arguments are relative
+ |      paths) or a totally different path (if one of the arguments is
+ |      anchored).
+ |  
+ |  mmaattcchh(self, path_pattern)
+ |      Return True if this path matches the given pattern.
+ |  
+ |  rreellaattiivvee__ttoo(self, *other)
+ |      Return the relative path to another path identified by the passed
+ |      arguments.  If the operation is not possible (because this is not
+ |      a subpath of the other path), raise ValueError.
+ |  
+ |  wwiitthh__nnaammee(self, name)
+ |      Return a new path with the file name changed.
+ |  
+ |  wwiitthh__ssuuffffiixx(self, suffix)
+ |      Return a new path with the file suffix changed.  If the path
+ |      has no suffix, add given suffix.  If the given suffix is an empty
+ |      string, remove the suffix from the path.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from PurePath:
+ |  
+ |  aanncchhoorr
+ |      The concatenation of the drive and root, or ''.
+ |  
+ |  ddrriivvee
+ |      The drive prefix (letter or UNC path), if any.
+ |  
+ |  nnaammee
+ |      The final path component, if any.
+ |  
+ |  ppaarreenntt
+ |      The logical parent of the path.
+ |  
+ |  ppaarreennttss
+ |      A sequence of this path's logical parents.
+ |  
+ |  ppaarrttss
+ |      An object providing sequence-like access to the
+ |      components in the filesystem path.
+ |  
+ |  rroooott
+ |      The root of the path, if any.
+ |  
+ |  sstteemm
+ |      The final path component, minus its last suffix.
+ |  
+ |  ssuuffffiixx
+ |      The final component's last suffix, if any.
+ |  
+ |  ssuuffffiixxeess
+ |      A list of the final component's suffixes, if any.

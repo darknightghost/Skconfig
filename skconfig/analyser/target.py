@@ -16,7 +16,12 @@
 import skconfig
 from skconfig import TypeChecker as TypeChecker
 import analyser
+import analyser.platform
+from analyser.platform import Platform as Platform
+import analyser.option
+from analyser.option import Option as Option
 import logging
+import pathlib
 import json
 
 
@@ -27,6 +32,9 @@ class Target:
         .target Json format:
         {
             "name" : "target name",
+            "platform" : platform,
+            "midDir": "objects directory.",
+            "output": "output file.",
             "dependencies" : [
                 "path of target file 1",
                 "path of target file 2",
@@ -56,6 +64,8 @@ class Target:
 
         Target config file format:
         {
+            "midDir": "objects directory.",
+            "output": "output file.",
             "platform" : platform-config,
             "options" : options-config
         }
@@ -69,11 +79,51 @@ class Target:
     @TypeChecker(object, str)
     def __init__(self, path):
         logging.debug("Loading target, path=\"%s\"", path)
-        self.__name = desc["name"]
+        self.__path = path
+        self.__load_target(path)
 
     def __load_target(self, path):
+        '''
+            Load target.
+        '''
+        #Load target
+        with open(path) as f:
+            desc = json.load(f)
+            self.__name = desc["name"]
+            logging.debug("name=\"%s\"" % (self.__name))
+            self.__platform = Platform(desc["platform"])
+            self.__mid_dir = desc["midDir"]
+            logging.debug("midDir=\"%s\"" % (self.__mid_dir))
+            self.__output = desc["output"]
+            logging.debug("output=\"%s\"" % (self.__output))
+            self.__dependencies = []
+            for d in desc["dependencies"]:
+                logging.debug("Dependency : \"%s\"" % (d))
+                self.__dependencies.append(str(pathlib.Path(d).absolute()))
+
+            self.__options = []
+            logging.debug("Loading options...")
+            for o in desc["options"]:
+                self.__options.append(Option(o))
+
+        #Load config file
+        cfg_path = pathlib.Path(path).absolute().parent / ".config"
+        if cfg_path.exists() \
+            and pathlib.Path.lstat().st_mtime < cfg_path.lstat().st_mtime:
+            logging.debug("Loading config file \"%s\"..." % (str(cfg_path)))
+            with open(str(cfg_path)) as f:
+                cfg = json.load(f)
+                self.__platform.load_cfg(cfg["platform"])
+                self.__mid_dir = cfg["midDir"]
+                logging.debug("midDir=\"%s\"" % (self.__mid_dir))
+                self.__output = cfg["output"]
+                logging.debug("output=\"%s\"" % (self.__output))
+                for i in range(0, len(self.__options)):
+                    self.__options[i].load_cfg(cfg["options"][i])
+
         #Search modules
         module_paths = analyser.scan_file(path, "\\.module")
+        logging.debug("Loading modules...")
 
     def __load_module(self, path):
         pass
@@ -103,12 +153,5 @@ class Target:
     def gen_cfg(self):
         '''
             Generate config.
-        '''
-        raise NotImplementedError()
-
-    @TypeChecker(object, dict)
-    def _load_cfg(self, cfg):
-        '''
-            Load config.
         '''
         raise NotImplementedError()
