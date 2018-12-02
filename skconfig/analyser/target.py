@@ -15,6 +15,7 @@
 '''
 import skconfig
 from skconfig import TypeChecker as TypeChecker
+import analyser
 import logging
 import json
 
@@ -72,9 +73,12 @@ class Target:
 
     def __load_target(self, path):
         #Search modules
-        pass
+        module_paths = analyser.scan_file(path, "\\.module")
 
     def __load_module(self, path):
+        pass
+
+    def __load_sources(self, dirname):
         pass
 
     def name(self):

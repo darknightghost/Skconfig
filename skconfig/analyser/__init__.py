@@ -18,7 +18,7 @@ import re
 import pathlib
 
 
-def scan_file(path, pattern, regexp=None):
+def scan_file(path, pattern, search_sub=True, regexp=None):
     '''
         Search files.
     '''
@@ -32,7 +32,8 @@ def scan_file(path, pattern, regexp=None):
     for p in begin_dir.glob("*"):
         if p.name not in (".", ".."):
             if p.is_dir():
-                ret += scan_file(str(p.absolute()), "", regexp)
+                if search_sub:
+                    ret += scan_file(str(p.absolute()), "", search_sub, regexp)
 
             elif regexp.fullmatch(p.name):
                 ret.append((str(p)))
